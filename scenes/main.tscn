@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bedtclhtqmljx"]
+
+[ext_resource type="PackedScene" uid="uid://8h7ps6lhedmb" path="res://scenes/players/warlock.tscn" id="1_o5qli"]
+
+[node name="Main" type="Node2D" unique_id=58767869]
+
+[node name="Warlock" parent="." unique_id=1749037957 instance=ExtResource("1_o5qli")]
