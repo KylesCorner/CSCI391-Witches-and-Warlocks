@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://cxec0n2dujs0f"]
 
+[ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player_controller.gd" id="1_841jd"]
 [ext_resource type="Texture2D" uid="uid://df1nh2j5s6w0r" path="res://assets/players/Blue Haired Woman/blue_haired_woman.png" id="1_fvywf"]
+[ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player_multiplayer_sync.gd" id="3_t6wks"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_841jd"]
 atlas = ExtResource("1_fvywf")
@@ -279,7 +281,11 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_28di1"]
 radius = 9.055386
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_28di1"]
+size = Vector2(15, 12)
+
 [node name="Witch" type="CharacterBody2D" unique_id=177407026]
+script = ExtResource("1_841jd")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1192627811]
 sprite_frames = SubResource("SpriteFrames_lixgu")
@@ -288,3 +294,14 @@ animation = &"Idle Front"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=574624922]
 position = Vector2(0, 5)
 shape = SubResource("CircleShape2D_28di1")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1219252013]
+
+[node name="MultiplayerSync" type="Node2D" parent="." unique_id=1832375486]
+script = ExtResource("3_t6wks")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=304811155]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1034320862]
+position = Vector2(-0.5, 4)
+shape = SubResource("RectangleShape2D_28di1")
