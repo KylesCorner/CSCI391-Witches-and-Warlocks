@@ -285,6 +285,7 @@ radius = 9.055386
 size = Vector2(15, 12)
 
 [node name="Witch" type="CharacterBody2D" unique_id=177407026]
+motion_mode = 1
 script = ExtResource("1_841jd")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1192627811]
@@ -303,5 +304,5 @@ script = ExtResource("3_t6wks")
 [node name="InteractionArea" type="Area2D" parent="." unique_id=304811155]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1034320862]
-position = Vector2(-0.5, 4)
+position = Vector2(0, 5)
 shape = SubResource("RectangleShape2D_28di1")
