@@ -3,7 +3,7 @@ extends Control
 
 #
 # ============================================================
-# NODES
+# CONNECTION CONTROLS
 # ============================================================
 #
 
@@ -22,6 +22,12 @@ extends Control
 @onready var status_label: Label = \
 	$Panel/VBoxContainer/StatusLabel
 
+
+#
+# ============================================================
+# CONNECTED-ONLY CONTROLS
+# ============================================================
+#
 
 @onready var player_list: VBoxContainer = \
 	$Panel/VBoxContainer/PlayerList
@@ -59,7 +65,7 @@ extends Control
 
 var local_ready: bool = false
 
-var connected_to_server: bool = false
+var is_connected: bool = false
 
 
 #
@@ -69,6 +75,18 @@ var connected_to_server: bool = false
 #
 
 func _ready() -> void:
+
+	#
+	# Force initial disconnected UI.
+	#
+	_set_connected_ui(
+		false
+	)
+
+
+	status_label.text = \
+		"Not connected"
+
 
 	#
 	# Network signals.
@@ -114,51 +132,41 @@ func _ready() -> void:
 	)
 
 
-	#
-	# Initial lobby state.
-	#
-	status_label.text = \
-		"Not connected"
-
-	connected_to_server = false
-
-	_set_lobby_options_visible(
-		false
-	)
-
-
 #
 # ============================================================
-# CONNECTION UI
+# CONNECTED UI
 # ============================================================
 #
 
-func _set_lobby_options_visible(
-	visible_state: bool
+func _set_connected_ui(
+	connected: bool
 ) -> void:
 
+	is_connected = connected
+
+
 	#
-	# These elements only appear after
-	# successfully connecting to the server.
+	# These controls only exist visually
+	# once we are connected to a server.
 	#
 	player_list.visible = \
-		visible_state
+		connected
 
 	class_label.visible = \
-		visible_state
+		connected
 
 	classes_container.visible = \
-		visible_state
+		connected
 
 	ready_button.visible = \
-		visible_state
+		connected
 
 
 	#
-	# Start is handled separately because
-	# only the lobby leader may see it.
+	# Start has an additional requirement:
+	# only the lobby leader gets to see it.
 	#
-	if not visible_state:
+	if not connected:
 
 		start_button.visible = false
 
@@ -171,7 +179,7 @@ func _set_lobby_options_visible(
 
 func _on_join_button_pressed() -> void:
 
-	if connected_to_server:
+	if is_connected:
 		return
 
 
@@ -199,13 +207,16 @@ func _on_join_button_pressed() -> void:
 
 #
 # ============================================================
-# CONNECTION EVENTS
+# CONNECTED
 # ============================================================
 #
 
 func _on_connected_to_server() -> void:
 
-	connected_to_server = true
+	print(
+		"Lobby: connected to server"
+	)
+
 
 	status_label.text = \
 		"Connected"
@@ -219,20 +230,29 @@ func _on_connected_to_server() -> void:
 
 
 	#
-	# Prevent trying to join again while
+	# Prevent another Join attempt while
 	# already connected.
 	#
 	join_button.disabled = true
 
 
-	_set_lobby_options_visible(
+	_set_connected_ui(
 		true
 	)
 
 
+#
+# ============================================================
+# CONNECTION FAILED
+# ============================================================
+#
+
 func _on_connection_failed() -> void:
 
-	connected_to_server = false
+	print(
+		"Lobby: connection failed"
+	)
+
 
 	status_label.text = \
 		"Connection failed"
@@ -241,29 +261,39 @@ func _on_connection_failed() -> void:
 	join_button.disabled = false
 
 
-	_set_lobby_options_visible(
+	_set_connected_ui(
 		false
 	)
 
 
+#
+# ============================================================
+# SERVER DISCONNECTED
+# ============================================================
+#
+
 func _on_server_disconnected() -> void:
 
-	connected_to_server = false
-
-	local_ready = false
+	print(
+		"Lobby: server disconnected"
+	)
 
 
 	status_label.text = \
 		"Server disconnected"
 
 
-	join_button.disabled = false
+	local_ready = false
+
 
 	ready_button.text = \
 		"Ready"
 
 
-	_set_lobby_options_visible(
+	join_button.disabled = false
+
+
+	_set_connected_ui(
 		false
 	)
 
@@ -276,7 +306,7 @@ func _on_server_disconnected() -> void:
 
 func _on_warlock_button_pressed() -> void:
 
-	if not connected_to_server:
+	if not is_connected:
 		return
 
 
@@ -291,7 +321,7 @@ func _on_warlock_button_pressed() -> void:
 
 func _on_witch_button_pressed() -> void:
 
-	if not connected_to_server:
+	if not is_connected:
 		return
 
 
@@ -312,7 +342,7 @@ func _on_witch_button_pressed() -> void:
 
 func _on_ready_button_pressed() -> void:
 
-	if not connected_to_server:
+	if not is_connected:
 		return
 
 
@@ -344,7 +374,7 @@ func _on_ready_button_pressed() -> void:
 
 func _on_start_button_pressed() -> void:
 
-	if not connected_to_server:
+	if not is_connected:
 		return
 
 
@@ -357,14 +387,27 @@ func _on_start_button_pressed() -> void:
 
 #
 # ============================================================
-# LOBBY DISPLAY
+# UPDATE LOBBY
 # ============================================================
 #
 
 func _update_lobby() -> void:
 
 	#
-	# Remove old player rows.
+	# Never reveal lobby controls unless
+	# we actually have a server connection.
+	#
+	if not is_connected:
+
+		_set_connected_ui(
+			false
+		)
+
+		return
+
+
+	#
+	# Remove old player-list entries.
 	#
 	for child in player_list.get_children():
 
@@ -372,7 +415,7 @@ func _update_lobby() -> void:
 
 
 	#
-	# Sort IDs for consistent display.
+	# Sort player IDs for a stable display.
 	#
 	var peer_ids := \
 		NetworkManager.players.keys()
@@ -382,12 +425,14 @@ func _update_lobby() -> void:
 
 
 	#
-	# Build player list.
+	# Rebuild player list.
 	#
 	for peer_id in peer_ids:
 
 		var info: Dictionary = \
-			NetworkManager.players[peer_id]
+			NetworkManager.players[
+				peer_id
+			]
 
 
 		var display_name := str(
@@ -406,7 +451,7 @@ func _update_lobby() -> void:
 		)
 
 
-		var is_ready := bool(
+		var player_ready := bool(
 			info.get(
 				"ready",
 				false
@@ -416,7 +461,7 @@ func _update_lobby() -> void:
 
 		var ready_text := \
 			"READY" \
-			if is_ready \
+			if player_ready \
 			else "NOT READY"
 
 
@@ -430,8 +475,7 @@ func _update_lobby() -> void:
 				" [LEADER]"
 
 
-		var row := \
-			Label.new()
+		var row := Label.new()
 
 
 		row.text = \
@@ -449,19 +493,17 @@ func _update_lobby() -> void:
 
 
 	#
-	# Only show Start when:
-	#
-	# 1. connected
-	# 2. this client is lobby leader
+	# Only the connected lobby leader
+	# gets the Start button.
 	#
 	start_button.visible = \
-		connected_to_server \
+		is_connected \
 		and NetworkManager.is_local_lobby_leader()
 
 
 	#
-	# The leader can only start once
-	# everyone is ready.
+	# Leader may only start once all
+	# players are ready.
 	#
 	start_button.disabled = \
 		not NetworkManager.can_start_game()

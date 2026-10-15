@@ -8,23 +8,10 @@ extends Node
 # ============================================================
 #
 
-#
-# Position updates per second.
-#
 @export var send_rate: float = 20.0
 
-
-#
-# How quickly remote characters move
-# toward the newest received position.
-#
 @export var interpolation_speed: float = 15.0
 
-
-#
-# If we're wildly out of sync, snap
-# instead of interpolating.
-#
 @export var snap_distance: float = 150.0
 
 
@@ -40,7 +27,7 @@ extends Node
 
 #
 # ============================================================
-# NETWORK MOVEMENT
+# REMOTE STATE
 # ============================================================
 #
 
@@ -57,20 +44,15 @@ var has_received_position: bool = false
 
 #
 # ============================================================
-# TIMING
+# SEND STATE
 # ============================================================
 #
 
 var send_timer: float = 0.0
 
 
-#
-# ============================================================
-# STATE TRACKING
-# ============================================================
-#
-
 var last_state: int = -1
+
 
 var last_facing_direction: int = -1
 
@@ -133,19 +115,13 @@ func _physics_process(
 
 #
 # ============================================================
-# LOCAL / AUTHORITATIVE PLAYER
+# LOCAL PLAYER
 # ============================================================
 #
 
 func _process_authority(
 	delta: float
 ) -> void:
-
-	#
-	# --------------------------------------------------------
-	# MOVEMENT
-	# --------------------------------------------------------
-	#
 
 	send_timer += delta
 
@@ -161,12 +137,6 @@ func _process_authority(
 			player.velocity
 		)
 
-
-	#
-	# --------------------------------------------------------
-	# STATE + DIRECTION
-	# --------------------------------------------------------
-	#
 
 	var current_state := \
 		int(player.state)
@@ -218,8 +188,8 @@ func _process_remote_player(
 
 
 	#
-	# If something went badly out of sync,
-	# snap immediately.
+	# If synchronization is way off,
+	# snap instead of interpolating.
 	#
 	if distance > snap_distance:
 
@@ -229,15 +199,11 @@ func _process_remote_player(
 		return
 
 
-	#
-	# Otherwise interpolate smoothly.
-	#
 	player.global_position = \
 		player.global_position.lerp(
 			target_position,
 			clamp(
-				interpolation_speed
-				* delta,
+				interpolation_speed * delta,
 				0.0,
 				1.0
 			)
@@ -253,7 +219,8 @@ func _process_remote_player(
 @rpc(
 	"authority",
 	"call_remote",
-	"unreliable_ordered"
+	"unreliable_ordered",
+	0
 )
 func sync_movement(
 	new_position: Vector2,
@@ -284,7 +251,8 @@ func sync_movement(
 @rpc(
 	"authority",
 	"call_remote",
-	"reliable"
+	"reliable",
+	1
 )
 func sync_state(
 	new_state: int,

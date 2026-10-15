@@ -14,10 +14,28 @@ signal state_changed(new_state: PlayerState)
 
 #
 # ============================================================
-# SETTINGS
+# CLASS SETTINGS
 # ============================================================
 #
 
+#
+# Each inherited player scene overrides this.
+#
+# Examples:
+#   warlock
+#   witch
+#   wizard
+#   knight
+#
+@export var class_id: String = "base"
+
+
+#
+# Generic movement speed.
+#
+# Individual classes can override this in
+# their inherited scene.
+#
 @export var speed: float = 100.0
 
 
@@ -30,11 +48,14 @@ signal state_changed(new_state: PlayerState)
 @onready var animated_sprite: AnimatedSprite2D = \
 	$AnimatedSprite2D
 
+
 @onready var interaction_area: Area2D = \
 	$InteractionArea
 
+
 @onready var camera: Camera2D = \
 	$Camera2D
+
 
 #
 # ============================================================
@@ -79,27 +100,26 @@ var state: PlayerState = \
 # ============================================================
 #
 
-
 func _ready() -> void:
 
 	if animated_sprite.sprite_frames == null:
 
 		push_error(
-			"AnimatedSprite2D has no SpriteFrames resource!"
+			"%s has no SpriteFrames resource!"
+			% class_id
 		)
 
 		return
 
 
 	#
-	# ========================================================
-	# LOCAL CAMERA
-	# ========================================================
+	# Only the player owned by this client
+	# gets an active camera.
 	#
-
 	if is_multiplayer_authority():
 
 		camera.enabled = true
+
 		camera.make_current()
 
 	else:
@@ -108,6 +128,7 @@ func _ready() -> void:
 
 
 	_update_current_animation()
+
 
 #
 # ============================================================
@@ -120,8 +141,8 @@ func _physics_process(
 ) -> void:
 
 	#
-	# Only the computer that owns this
-	# player processes keyboard input.
+	# Remote players are driven by the
+	# multiplayer synchronization script.
 	#
 	if not is_multiplayer_authority():
 		return
@@ -151,7 +172,7 @@ func _physics_process(
 
 
 	#
-	# E = interact
+	# Generic interaction button.
 	#
 	if Input.is_action_just_pressed(
 		"interact"
@@ -168,12 +189,13 @@ func _physics_process(
 
 func _process_movement() -> void:
 
-	var input_direction := Input.get_vector(
-		"move_left",
-		"move_right",
-		"move_up",
-		"move_down"
-	)
+	var input_direction := \
+		Input.get_vector(
+			"move_left",
+			"move_right",
+			"move_up",
+			"move_down"
+		)
 
 
 	velocity = \
@@ -275,10 +297,12 @@ func apply_network_state(
 	new_facing_direction: int
 ) -> void:
 
-	state = new_state
+	state = \
+		new_state as PlayerState
+
 
 	facing_direction = \
-		new_facing_direction
+		new_facing_direction as Direction
 
 
 	_update_current_animation()
@@ -324,11 +348,8 @@ func update_facing_direction(
 				Direction.BACK
 
 
-	#
-	# Direction changed while still in
-	# the same state, so update animation.
-	#
-	if old_direction != facing_direction:
+	if old_direction != \
+			facing_direction:
 
 		_update_current_animation()
 
@@ -385,21 +406,28 @@ func play_walk_animation() -> void:
 	match facing_direction:
 
 		Direction.FRONT:
+
 			change_animation(
 				"Walk Front"
 			)
 
+
 		Direction.BACK:
+
 			change_animation(
 				"Walk Back"
 			)
 
+
 		Direction.LEFT:
+
 			change_animation(
 				"Walk Left"
 			)
 
+
 		Direction.RIGHT:
+
 			change_animation(
 				"Walk Right"
 			)
@@ -416,21 +444,28 @@ func play_idle_animation() -> void:
 	match facing_direction:
 
 		Direction.FRONT:
+
 			change_animation(
 				"Idle Front"
 			)
 
+
 		Direction.BACK:
+
 			change_animation(
 				"Idle Back"
 			)
 
+
 		Direction.LEFT:
+
 			change_animation(
 				"Idle Left"
 			)
 
+
 		Direction.RIGHT:
+
 			change_animation(
 				"Idle Right"
 			)
@@ -465,7 +500,7 @@ func play_state_animation(
 
 		#
 		# Attack / Hurt / Dead animations
-		# don't have to exist yet.
+		# are optional for now.
 		#
 		play_idle_animation()
 
@@ -483,11 +518,14 @@ func get_direction_name() -> String:
 		Direction.FRONT:
 			return "Front"
 
+
 		Direction.BACK:
 			return "Back"
 
+
 		Direction.LEFT:
 			return "Left"
+
 
 		Direction.RIGHT:
 			return "Right"
@@ -515,8 +553,11 @@ func change_animation(
 	):
 
 		push_warning(
-			"Missing animation: %s"
-			% animation_name
+			"%s is missing animation: %s"
+			% [
+				class_id,
+				animation_name
+			]
 		)
 
 		return
@@ -572,7 +613,7 @@ func _get_closest_interactable() -> Node:
 
 
 	#
-	# Check Area2D objects.
+	# Check Area2D interactables.
 	#
 	for area in \
 			interaction_area.get_overlapping_areas():
@@ -580,6 +621,10 @@ func _get_closest_interactable() -> Node:
 		var target: Node = area
 
 
+		#
+		# Sometimes the Area2D itself isn't
+		# the interactable, but its parent is.
+		#
 		if not target.is_in_group(
 			"interactable"
 		):
@@ -599,12 +644,14 @@ func _get_closest_interactable() -> Node:
 		if not target.is_in_group(
 			"interactable"
 		):
+
 			continue
 
 
 		if not target.has_method(
 			"interact"
 		):
+
 			continue
 
 
@@ -618,13 +665,15 @@ func _get_closest_interactable() -> Node:
 
 		if distance < closest_distance:
 
-			closest_distance = distance
+			closest_distance = \
+				distance
 
-			closest_target = target
+			closest_target = \
+				target
 
 
 	#
-	# Check physics bodies such as doors.
+	# Check physics-body interactables.
 	#
 	for body in \
 			interaction_area.get_overlapping_bodies():
@@ -635,12 +684,14 @@ func _get_closest_interactable() -> Node:
 		if not target.is_in_group(
 			"interactable"
 		):
+
 			continue
 
 
 		if not target.has_method(
 			"interact"
 		):
+
 			continue
 
 
@@ -654,13 +705,21 @@ func _get_closest_interactable() -> Node:
 
 		if distance < closest_distance:
 
-			closest_distance = distance
+			closest_distance = \
+				distance
 
-			closest_target = target
+			closest_target = \
+				target
 
 
 	return closest_target
 
+
+#
+# ============================================================
+# TARGET POSITION
+# ============================================================
+#
 
 func _get_target_position(
 	target: Node
