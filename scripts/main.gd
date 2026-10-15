@@ -3,7 +3,7 @@ extends Node2D
 
 #
 # ============================================================
-# PLAYER CLASS SCENES
+# PLAYER CLASSES
 # ============================================================
 #
 
@@ -46,10 +46,6 @@ const PLAYER_SCENES := {
 
 func _ready() -> void:
 
-	#
-	# Server waits until every peer has
-	# finished loading this scene.
-	#
 	if multiplayer.is_server():
 
 		NetworkManager.all_players_loaded.connect(
@@ -58,8 +54,8 @@ func _ready() -> void:
 
 
 	#
-	# Allow one frame for Main and all
-	# children to finish entering tree.
+	# Give the scene one frame to fully
+	# enter the tree.
 	#
 	await get_tree().process_frame
 
@@ -69,7 +65,7 @@ func _ready() -> void:
 
 #
 # ============================================================
-# SPAWN ALL PLAYERS
+# SPAWN EVERYONE
 # ============================================================
 #
 
@@ -82,10 +78,11 @@ func _spawn_all_players() -> void:
 	var peer_ids := \
 		NetworkManager.players.keys()
 
+
 	peer_ids.sort()
 
 
-	var spawn_index: int = 0
+	var spawn_index := 0
 
 
 	for peer_id in peer_ids:
@@ -114,7 +111,7 @@ func _spawn_all_players() -> void:
 
 #
 # ============================================================
-# SPAWN ONE PLAYER
+# SPAWN ONE
 # ============================================================
 #
 
@@ -132,8 +129,9 @@ func spawn_player(
 	if not PLAYER_SCENES.has(
 		selected_class
 	):
+
 		push_error(
-			"Unknown class: %s"
+			"Unknown player class: %s"
 			% selected_class
 		)
 
@@ -144,20 +142,20 @@ func spawn_player(
 			spawn_points.size():
 
 		push_error(
-			"Not enough spawn points"
+			"Not enough spawn points."
 		)
 
 		return
 
 
-	#
-	# Prevent accidental duplicate spawning.
-	#
-	var player_name := str(peer_id)
+	var player_name := \
+		str(peer_id)
+
 
 	if players_node.has_node(
 		NodePath(player_name)
 	):
+
 		return
 
 
@@ -170,15 +168,14 @@ func spawn_player(
 
 
 	#
-	# Every peer must use the exact same
-	# node name.
+	# Matching names across every machine.
 	#
-	player.name = player_name
+	player.name = \
+		player_name
 
 
 	#
-	# This determines which computer gets
-	# to control this player.
+	# Client owns its own character.
 	#
 	player.set_multiplayer_authority(
 		peer_id,
@@ -195,12 +192,6 @@ func spawn_player(
 		spawn_points[
 			spawn_index
 		].global_position
-
-
-	player.set_meta(
-		"player_class",
-		selected_class
-	)
 
 
 	print(

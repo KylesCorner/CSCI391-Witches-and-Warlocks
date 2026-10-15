@@ -11,6 +11,7 @@ radius = 9.055386
 size = Vector2(15, 12)
 
 [node name="Warlock" type="CharacterBody2D" unique_id=1749037957]
+motion_mode = 1
 script = ExtResource("1_ue367")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1216495168]
@@ -29,5 +30,5 @@ script = ExtResource("3_n2tkr")
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1861139125]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1610111241]
-position = Vector2(-0.5, 4)
+position = Vector2(0, 6)
 shape = SubResource("RectangleShape2D_gocbq")

@@ -33,6 +33,8 @@ signal state_changed(new_state: PlayerState)
 @onready var interaction_area: Area2D = \
 	$InteractionArea
 
+@onready var camera: Camera2D = \
+	$Camera2D
 
 #
 # ============================================================
@@ -77,6 +79,7 @@ var state: PlayerState = \
 # ============================================================
 #
 
+
 func _ready() -> void:
 
 	if animated_sprite.sprite_frames == null:
@@ -88,8 +91,23 @@ func _ready() -> void:
 		return
 
 
-	_update_current_animation()
+	#
+	# ========================================================
+	# LOCAL CAMERA
+	# ========================================================
+	#
 
+	if is_multiplayer_authority():
+
+		camera.enabled = true
+		camera.make_current()
+
+	else:
+
+		camera.enabled = false
+
+
+	_update_current_animation()
 
 #
 # ============================================================

@@ -36,18 +36,11 @@ text = "Player Name"
 layout_mode = 2
 text = "127.0.0.1"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=2019714379]
-layout_mode = 2
-
-[node name="HostButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1223526753]
-layout_mode = 2
-text = "HOST"
-
-[node name="JoinButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1874653664]
+[node name="JoinButton" type="Button" parent="Panel/VBoxContainer" unique_id=1874653664]
 layout_mode = 2
 text = "JOIN"
 
-[node name="StatusLabel" type="Label" parent="Panel/VBoxContainer/HBoxContainer" unique_id=2093177097]
+[node name="StatusLabel" type="Label" parent="Panel/VBoxContainer" unique_id=2093177097]
 layout_mode = 2
 text = "STATUS"
 

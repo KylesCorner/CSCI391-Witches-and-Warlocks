@@ -3,7 +3,7 @@ extends Control
 
 #
 # ============================================================
-# NODE REFERENCES
+# NODES
 # ============================================================
 #
 
@@ -15,22 +15,22 @@ extends Control
 	$Panel/VBoxContainer/IPAddress
 
 
-@onready var host_button: Button = \
-	$Panel/VBoxContainer/HBoxContainer/HostButton
-
-
 @onready var join_button: Button = \
-	$Panel/VBoxContainer/HBoxContainer/JoinButton
+	$Panel/VBoxContainer/JoinButton
 
 
 @onready var status_label: Label = \
-	$Panel/VBoxContainer/HBoxContainer/StatusLabel
+	$Panel/VBoxContainer/StatusLabel
 
 
 @onready var player_list: VBoxContainer = \
 	$Panel/VBoxContainer/PlayerList
 
 
+#
+# NOTE:
+# Your scene currently calls this node HBoxContainer2.
+#
 @onready var warlock_button: Button = \
 	$Panel/VBoxContainer/HBoxContainer2/WarlockButton
 
@@ -49,7 +49,7 @@ extends Control
 
 #
 # ============================================================
-# LOCAL STATE
+# STATE
 # ============================================================
 #
 
@@ -87,10 +87,6 @@ func _ready() -> void:
 	#
 	# Button signals.
 	#
-	host_button.pressed.connect(
-		_on_host_button_pressed
-	)
-
 	join_button.pressed.connect(
 		_on_join_button_pressed
 	)
@@ -112,39 +108,13 @@ func _ready() -> void:
 	)
 
 
+	#
+	# Initial UI.
+	#
 	status_label.text = \
 		"Not connected"
 
 	start_button.visible = false
-
-
-#
-# ============================================================
-# HOST
-# ============================================================
-#
-
-func _on_host_button_pressed() -> void:
-
-	var error := NetworkManager.host_game(
-		player_name.text
-	)
-
-	if error != OK:
-
-		status_label.text = \
-			"Could not host"
-
-		return
-
-	local_ready = false
-
-	ready_button.text = "Ready"
-
-	status_label.text = \
-		"Hosting"
-
-	_update_lobby()
 
 
 #
@@ -158,10 +128,13 @@ func _on_join_button_pressed() -> void:
 	status_label.text = \
 		"Connecting..."
 
-	var error := NetworkManager.join_game(
-		address.text,
-		player_name.text
-	)
+
+	var error := \
+		NetworkManager.join_game(
+			address.text,
+			player_name.text
+		)
+
 
 	if error != OK:
 
@@ -171,12 +144,13 @@ func _on_join_button_pressed() -> void:
 
 func _on_connected_to_server() -> void:
 
-	local_ready = false
-
-	ready_button.text = "Ready"
-
 	status_label.text = \
 		"Connected"
+
+	local_ready = false
+
+	ready_button.text = \
+		"Ready"
 
 
 func _on_connection_failed() -> void:
@@ -227,11 +201,14 @@ func _on_witch_button_pressed() -> void:
 
 func _on_ready_button_pressed() -> void:
 
-	local_ready = not local_ready
+	local_ready = \
+		not local_ready
+
 
 	NetworkManager.set_player_ready(
 		local_ready
 	)
+
 
 	if local_ready:
 
@@ -246,25 +223,25 @@ func _on_ready_button_pressed() -> void:
 
 #
 # ============================================================
-# START GAME
+# START
 # ============================================================
 #
 
 func _on_start_button_pressed() -> void:
 
-	NetworkManager.start_game()
+	NetworkManager.request_start_game()
 
 
 #
 # ============================================================
-# UPDATE LOBBY UI
+# LOBBY DISPLAY
 # ============================================================
 #
 
 func _update_lobby() -> void:
 
 	#
-	# Remove previous rows.
+	# Remove old player rows.
 	#
 	for child in player_list.get_children():
 
@@ -272,7 +249,8 @@ func _update_lobby() -> void:
 
 
 	#
-	# Create player rows.
+	# Sort peers so the player list doesn't
+	# jump around every update.
 	#
 	var peer_ids := \
 		NetworkManager.players.keys()
@@ -280,10 +258,14 @@ func _update_lobby() -> void:
 	peer_ids.sort()
 
 
+	#
+	# Create one row per player.
+	#
 	for peer_id in peer_ids:
 
 		var info: Dictionary = \
 			NetworkManager.players[peer_id]
+
 
 		var display_name := str(
 			info.get(
@@ -292,12 +274,14 @@ func _update_lobby() -> void:
 			)
 		)
 
+
 		var selected_class := str(
 			info.get(
 				"class",
 				"warlock"
 			)
 		)
+
 
 		var is_ready := bool(
 			info.get(
@@ -313,13 +297,28 @@ func _update_lobby() -> void:
 			else "NOT READY"
 
 
-		var row := Label.new()
+		var leader_text := ""
 
-		row.text = "%s | %s | %s" % [
-			display_name,
-			selected_class.capitalize(),
-			ready_text
-		]
+
+		if int(peer_id) == \
+				NetworkManager.lobby_leader_id:
+
+			leader_text = \
+				" [LEADER]"
+
+
+		var row := \
+			Label.new()
+
+
+		row.text = \
+			"%s%s | %s | %s" % [
+				display_name,
+				leader_text,
+				selected_class.capitalize(),
+				ready_text
+			]
+
 
 		player_list.add_child(
 			row
@@ -327,11 +326,11 @@ func _update_lobby() -> void:
 
 
 	#
-	# Start button belongs to host only.
+	# Only the lobby leader gets the
+	# Start Game button.
 	#
 	start_button.visible = \
-		multiplayer.is_server() \
-		and NetworkManager.players.has(1)
+		NetworkManager.is_local_lobby_leader()
 
 
 	start_button.disabled = \
