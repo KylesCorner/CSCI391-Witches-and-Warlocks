@@ -1,36 +1,5 @@
-[gd_scene format=3 uid="uid://cxec0n2dujs0f"]
+[gd_scene format=3 uid="uid://1hv7xp8hv7io"]
 
-[ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player_controller.gd" id="1_841jd"]
-[ext_resource type="SpriteFrames" uid="uid://080rtq7hyanu" path="res://assets/animations/blue_hair_woman.tres" id="2_t6wks"]
-[ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player_multiplayer_sync.gd" id="3_t6wks"]
+[ext_resource type="PackedScene" uid="uid://r8mrfcjm4jhk" path="res://scenes/players/base_player.tscn" id="1_fvywf"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_28di1"]
-radius = 9.055386
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_gocbq"]
-size = Vector2(15, 12)
-
-[node name="Warlock" type="CharacterBody2D" unique_id=1749037957]
-motion_mode = 1
-script = ExtResource("1_841jd")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1216495168]
-sprite_frames = ExtResource("2_t6wks")
-animation = &"Walk Right"
-frame = 3
-frame_progress = 1.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=779529829]
-position = Vector2(0, 6)
-shape = SubResource("CircleShape2D_28di1")
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=642818378]
-
-[node name="MultiplayerSync" type="Node2D" parent="." unique_id=774479579]
-script = ExtResource("3_t6wks")
-
-[node name="InteractionArea" type="Area2D" parent="." unique_id=1861139125]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1610111241]
-position = Vector2(0, 6)
-shape = SubResource("RectangleShape2D_gocbq")
+[node name="Witch" unique_id=1914179753 instance=ExtResource("1_fvywf")]

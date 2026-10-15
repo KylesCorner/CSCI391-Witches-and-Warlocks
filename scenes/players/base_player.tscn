@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://r8mrfcjm4jhk"]
+
+[ext_resource type="SpriteFrames" uid="uid://080rtq7hyanu" path="res://assets/animations/blue_hair_woman.tres" id="1_ggyfd"]
+[ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player_controller.gd" id="1_vitqv"]
+[ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player_multiplayer_sync.gd" id="2_vitqv"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_28di1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2dw7i"]
+size = Vector2(15, 12)
+
+[node name="BasePlayer" type="CharacterBody2D" unique_id=1914179753]
+script = ExtResource("1_vitqv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=765943247]
+sprite_frames = ExtResource("1_ggyfd")
+animation = &"Walk Right"
+frame = 3
+frame_progress = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1463385978]
+position = Vector2(0, 6)
+shape = SubResource("CircleShape2D_28di1")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=220478607]
+
+[node name="MultiplayerSync" type="Node2D" parent="." unique_id=912018745]
+script = ExtResource("2_vitqv")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=1050043635]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1962315159]
+position = Vector2(0, 6)
+shape = SubResource("RectangleShape2D_2dw7i")

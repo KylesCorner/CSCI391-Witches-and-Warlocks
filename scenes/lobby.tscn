@@ -45,13 +45,16 @@ layout_mode = 2
 text = "STATUS"
 
 [node name="PlayerList" type="VBoxContainer" parent="Panel/VBoxContainer" unique_id=673951120]
+visible = false
 layout_mode = 2
 
 [node name="ClassLabel" type="Label" parent="Panel/VBoxContainer" unique_id=2130044991]
+visible = false
 layout_mode = 2
 text = "CLASSES"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=1992906452]
+visible = false
 layout_mode = 2
 
 [node name="WarlockButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer2" unique_id=1712430899]
@@ -63,9 +66,11 @@ layout_mode = 2
 text = "WITCH"
 
 [node name="ReadyButton" type="Button" parent="Panel/VBoxContainer" unique_id=1593272620]
+visible = false
 layout_mode = 2
 text = "READY"
 
 [node name="StartButton" type="Button" parent="Panel/VBoxContainer" unique_id=1210797474]
+visible = false
 layout_mode = 2
 text = "START"
