@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Witches and Warlocks"
-run/main_scene="uid://bcgjt5t0gvyer"
+run/main_scene="uid://bnac8w8y7uvxq"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]

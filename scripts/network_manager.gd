@@ -28,17 +28,28 @@ enum SessionState {
 }
 
 
-var session_state: SessionState = SessionState.DISCONNECTED
+var session_state: SessionState = \
+	SessionState.DISCONNECTED
 
 
 #
 # ============================================================
-# NETWORK SETTINGS
+# SETTINGS
 # ============================================================
 #
 
 const PORT: int = 7000
+
 const MAX_PLAYERS: int = 4
+
+#
+# Keep at 1 while developing.
+#
+# Change to 4 if you eventually want to
+# require a full lobby.
+#
+const MIN_PLAYERS_TO_START: int = 1
+
 
 const GAME_SCENE: String = \
 	"res://scenes/main.tscn"
@@ -57,10 +68,14 @@ const VALID_CLASSES: Array[String] = [
 #
 
 #
+# Peer 1 is the dedicated server and is
+# NEVER stored here.
+#
+#
 # Example:
 #
 # {
-#     1: {
+#     12345: {
 #         "name": "Kyle",
 #         "class": "warlock",
 #         "ready": true
@@ -78,9 +93,21 @@ var local_player_info: Dictionary = {
 
 
 #
-# Tracks which peers finished loading main.tscn.
+# First player into the lobby gets the
+# Start button.
 #
+var lobby_leader_id: int = 0
+
+
+#
+# ============================================================
+# GAME LOADING
+# ============================================================
+#
+
 var loaded_players: Dictionary = {}
+
+var server_game_loaded: bool = false
 
 
 #
@@ -110,56 +137,71 @@ func _ready() -> void:
 
 #
 # ============================================================
-# HOST
+# DEDICATED SERVER
 # ============================================================
 #
 
-func host_game(
-	player_name_text: String
-) -> Error:
+func start_dedicated_server() -> Error:
 
 	_reset_session()
 
-	var clean_name := \
-		player_name_text.strip_edges()
 
-	if clean_name.is_empty():
-		clean_name = "Host"
+	var peer := \
+		ENetMultiplayerPeer.new()
 
-	local_player_info = {
-		"name": clean_name,
-		"class": "warlock",
-		"ready": false
-	}
 
-	var peer := ENetMultiplayerPeer.new()
-
+	#
+	# Dedicated server is not one of the
+	# players, so all four connection slots
+	# belong to clients.
+	#
 	var error := peer.create_server(
 		PORT,
 		MAX_PLAYERS
 	)
 
+
 	if error != OK:
+
 		return error
+
 
 	multiplayer.multiplayer_peer = peer
 
-	#
-	# Server is always peer ID 1.
-	#
-	players[1] = \
-		local_player_info.duplicate(true)
 
-	session_state = SessionState.LOBBY
+	session_state = \
+		SessionState.LOBBY
 
-	lobby_updated.emit()
+
+	print(
+		"======================================"
+	)
+
+	print(
+		"Witches and Warlocks Dedicated Server"
+	)
+
+	print(
+		"Port: ",
+		PORT
+	)
+
+	print(
+		"Player slots: ",
+		MAX_PLAYERS
+	)
+
+	print(
+		"======================================"
+	)
+
 
 	return OK
 
 
 #
 # ============================================================
-# JOIN
+# CLIENT JOIN
 # ============================================================
 #
 
@@ -170,11 +212,15 @@ func join_game(
 
 	_reset_session()
 
+
 	var clean_name := \
 		player_name_text.strip_edges()
 
+
 	if clean_name.is_empty():
+
 		clean_name = "Player"
+
 
 	local_player_info = {
 		"name": clean_name,
@@ -182,23 +228,33 @@ func join_game(
 		"ready": false
 	}
 
+
 	var address := \
 		address_text.strip_edges()
 
+
 	if address.is_empty():
+
 		address = "127.0.0.1"
 
-	var peer := ENetMultiplayerPeer.new()
+
+	var peer := \
+		ENetMultiplayerPeer.new()
+
 
 	var error := peer.create_client(
 		address,
 		PORT
 	)
 
+
 	if error != OK:
+
 		return error
 
+
 	multiplayer.multiplayer_peer = peer
+
 
 	return OK
 
@@ -211,12 +267,15 @@ func join_game(
 
 func _on_connected_to_server() -> void:
 
-	session_state = SessionState.LOBBY
+	session_state = \
+		SessionState.LOBBY
+
 
 	register_player.rpc_id(
 		1,
 		local_player_info
 	)
+
 
 	connected_to_server.emit()
 
@@ -242,10 +301,35 @@ func _on_peer_disconnected(
 	if not multiplayer.is_server():
 		return
 
-	players.erase(peer_id)
-	loaded_players.erase(peer_id)
+
+	print(
+		"Player disconnected: ",
+		peer_id
+	)
+
+
+	players.erase(
+		peer_id
+	)
+
+
+	loaded_players.erase(
+		peer_id
+	)
+
+
+	if peer_id == lobby_leader_id:
+
+		_assign_new_lobby_leader()
+
 
 	_sync_lobby()
+
+
+	if session_state == \
+			SessionState.LOADING:
+
+		_check_all_game_loaded()
 
 
 #
@@ -266,8 +350,22 @@ func register_player(
 	if not multiplayer.is_server():
 		return
 
+
 	var peer_id := \
 		multiplayer.get_remote_sender_id()
+
+
+	if peer_id == 1:
+		return
+
+
+	#
+	# Reject registration beyond our
+	# configured capacity.
+	#
+	if players.size() >= MAX_PLAYERS:
+		return
+
 
 	var new_player_name := str(
 		info.get(
@@ -276,6 +374,7 @@ func register_player(
 		)
 	)
 
+
 	var selected_class := str(
 		info.get(
 			"class",
@@ -283,8 +382,11 @@ func register_player(
 		)
 	)
 
+
 	if selected_class not in VALID_CLASSES:
+
 		selected_class = "warlock"
+
 
 	players[peer_id] = {
 		"name": new_player_name,
@@ -292,7 +394,73 @@ func register_player(
 		"ready": false
 	}
 
+
+	#
+	# First player becomes lobby leader.
+	#
+	if lobby_leader_id == 0:
+
+		lobby_leader_id = \
+			peer_id
+
+
+	print(
+		"Player joined: ",
+		new_player_name,
+		" [",
+		peer_id,
+		"]"
+	)
+
+
 	_sync_lobby()
+
+
+#
+# ============================================================
+# LOBBY LEADER
+# ============================================================
+#
+
+func _assign_new_lobby_leader() -> void:
+
+	lobby_leader_id = 0
+
+
+	if players.is_empty():
+		return
+
+
+	var peer_ids := \
+		players.keys()
+
+
+	peer_ids.sort()
+
+
+	lobby_leader_id = \
+		int(peer_ids[0])
+
+
+	print(
+		"New lobby leader: ",
+		lobby_leader_id
+	)
+
+
+func is_local_lobby_leader() -> bool:
+
+	if multiplayer.is_server():
+		return false
+
+
+	if lobby_leader_id == 0:
+		return false
+
+
+	return \
+		multiplayer.get_unique_id() \
+		== lobby_leader_id
 
 
 #
@@ -308,23 +476,19 @@ func choose_class(
 	if selected_class not in VALID_CLASSES:
 		return
 
-	local_player_info["class"] = selected_class
 
 	if multiplayer.is_server():
+		return
 
-		if not players.has(1):
-			return
 
-		players[1]["class"] = selected_class
+	local_player_info["class"] = \
+		selected_class
 
-		_sync_lobby()
 
-	else:
-
-		request_class_change.rpc_id(
-			1,
-			selected_class
-		)
+	request_class_change.rpc_id(
+		1,
+		selected_class
+	)
 
 
 @rpc(
@@ -339,17 +503,24 @@ func request_class_change(
 	if not multiplayer.is_server():
 		return
 
+
 	if selected_class not in VALID_CLASSES:
 		return
+
 
 	var peer_id := \
 		multiplayer.get_remote_sender_id()
 
-	if not players.has(peer_id):
+
+	if not players.has(
+		peer_id
+	):
 		return
+
 
 	players[peer_id]["class"] = \
 		selected_class
+
 
 	_sync_lobby()
 
@@ -364,23 +535,18 @@ func set_player_ready(
 	is_ready: bool
 ) -> void:
 
-	local_player_info["ready"] = is_ready
-
 	if multiplayer.is_server():
+		return
 
-		if not players.has(1):
-			return
 
-		players[1]["ready"] = is_ready
+	local_player_info["ready"] = \
+		is_ready
 
-		_sync_lobby()
 
-	else:
-
-		request_ready_change.rpc_id(
-			1,
-			is_ready
-		)
+	request_ready_change.rpc_id(
+		1,
+		is_ready
+	)
 
 
 @rpc(
@@ -395,13 +561,20 @@ func request_ready_change(
 	if not multiplayer.is_server():
 		return
 
+
 	var peer_id := \
 		multiplayer.get_remote_sender_id()
 
-	if not players.has(peer_id):
+
+	if not players.has(
+		peer_id
+	):
 		return
 
-	players[peer_id]["ready"] = is_ready
+
+	players[peer_id]["ready"] = \
+		is_ready
+
 
 	_sync_lobby()
 
@@ -417,8 +590,10 @@ func _sync_lobby() -> void:
 	if not multiplayer.is_server():
 		return
 
+
 	receive_lobby_state.rpc(
-		players.duplicate(true)
+		players.duplicate(true),
+		lobby_leader_id
 	)
 
 
@@ -428,30 +603,34 @@ func _sync_lobby() -> void:
 	"reliable"
 )
 func receive_lobby_state(
-	new_players: Dictionary
+	new_players: Dictionary,
+	new_lobby_leader_id: int
 ) -> void:
 
-	players = new_players.duplicate(true)
+	players = \
+		new_players.duplicate(true)
+
+
+	lobby_leader_id = \
+		new_lobby_leader_id
+
 
 	lobby_updated.emit()
 
 
 #
 # ============================================================
-# START GAME
+# CAN START?
 # ============================================================
 #
 
 func can_start_game() -> bool:
 
-	if not multiplayer.is_server():
+	if players.size() < \
+			MIN_PLAYERS_TO_START:
+
 		return false
 
-	#
-	# Require at least two players.
-	#
-	if players.size() < 2:
-		return false
 
 	for player_info in players.values():
 
@@ -461,28 +640,109 @@ func can_start_game() -> bool:
 				false
 			)
 		):
+
 			return false
+
 
 	return true
 
 
-func start_game() -> void:
+#
+# ============================================================
+# START REQUEST
+# ============================================================
+#
+
+func request_start_game() -> void:
+
+	if multiplayer.is_server():
+		return
+
+
+	if not is_local_lobby_leader():
+		return
+
+
+	request_start_game_server.rpc_id(
+		1
+	)
+
+
+@rpc(
+	"any_peer",
+	"call_remote",
+	"reliable"
+)
+func request_start_game_server() -> void:
 
 	if not multiplayer.is_server():
 		return
 
-	if not can_start_game():
+
+	var sender_id := \
+		multiplayer.get_remote_sender_id()
+
+
+	if sender_id != lobby_leader_id:
+
+		print(
+			"Rejected start request from ",
+			sender_id
+		)
+
 		return
+
+
+	if not can_start_game():
+
+		print(
+			"Cannot start game yet."
+		)
+
+		return
+
+
+	_start_game()
+
+
+#
+# ============================================================
+# START GAME
+# ============================================================
+#
+
+func _start_game() -> void:
+
+	if not multiplayer.is_server():
+		return
+
 
 	session_state = \
 		SessionState.LOADING
 
+
 	loaded_players.clear()
+
+	server_game_loaded = false
+
+
+	print(
+		"Starting game with ",
+		players.size(),
+		" player(s)."
+	)
+
 
 	load_game.rpc(
 		GAME_SCENE
 	)
 
+
+#
+# ============================================================
+# LOAD GAME SCENE
+# ============================================================
+#
 
 @rpc(
 	"authority",
@@ -492,6 +752,10 @@ func start_game() -> void:
 func load_game(
 	scene_path: String
 ) -> void:
+
+	session_state = \
+		SessionState.LOADING
+
 
 	get_tree().change_scene_to_file(
 		scene_path
@@ -506,18 +770,30 @@ func load_game(
 
 func report_game_loaded() -> void:
 
-	var peer_id := \
-		multiplayer.get_unique_id()
-
+	#
+	# Dedicated server.
+	#
 	if multiplayer.is_server():
 
-		_mark_player_loaded(
-			peer_id
+		server_game_loaded = true
+
+
+		print(
+			"Server loaded main scene."
 		)
 
-	else:
 
-		player_loaded.rpc_id(1)
+		_check_all_game_loaded()
+
+		return
+
+
+	#
+	# Client.
+	#
+	player_loaded.rpc_id(
+		1
+	)
 
 
 @rpc(
@@ -530,22 +806,22 @@ func player_loaded() -> void:
 	if not multiplayer.is_server():
 		return
 
+
 	var peer_id := \
 		multiplayer.get_remote_sender_id()
 
-	_mark_player_loaded(
+
+	if not players.has(
 		peer_id
-	)
+	):
+		return
 
-
-func _mark_player_loaded(
-	peer_id: int
-) -> void:
 
 	loaded_players[peer_id] = true
 
+
 	print(
-		"Loaded peer ",
+		"Player loaded: ",
 		peer_id,
 		" (",
 		loaded_players.size(),
@@ -554,14 +830,52 @@ func _mark_player_loaded(
 		")"
 	)
 
+
+	_check_all_game_loaded()
+
+
+func _check_all_game_loaded() -> void:
+
+	if not multiplayer.is_server():
+		return
+
+
+	if not server_game_loaded:
+		return
+
+
 	if loaded_players.size() != \
 			players.size():
+
 		return
+
+
+	print(
+		"Everyone loaded."
+	)
+
+
+	set_playing.rpc()
+
+
+	all_players_loaded.emit()
+
+
+#
+# ============================================================
+# PLAYING
+# ============================================================
+#
+
+@rpc(
+	"authority",
+	"call_local",
+	"reliable"
+)
+func set_playing() -> void:
 
 	session_state = \
 		SessionState.PLAYING
-
-	all_players_loaded.emit()
 
 
 #
@@ -573,10 +887,18 @@ func _mark_player_loaded(
 func _reset_session() -> void:
 
 	players.clear()
+
 	loaded_players.clear()
+
+
+	lobby_leader_id = 0
+
+	server_game_loaded = false
+
 
 	session_state = \
 		SessionState.DISCONNECTED
+
 
 	multiplayer.multiplayer_peer = \
 		OfflineMultiplayerPeer.new()
