@@ -27,10 +27,14 @@ extends Control
 	$Panel/VBoxContainer/PlayerList
 
 
-#
-# NOTE:
-# Your scene currently calls this node HBoxContainer2.
-#
+@onready var class_label: Label = \
+	$Panel/VBoxContainer/ClassLabel
+
+
+@onready var classes_container: HBoxContainer = \
+	$Panel/VBoxContainer/HBoxContainer2
+
+
 @onready var warlock_button: Button = \
 	$Panel/VBoxContainer/HBoxContainer2/WarlockButton
 
@@ -49,11 +53,13 @@ extends Control
 
 #
 # ============================================================
-# STATE
+# LOCAL STATE
 # ============================================================
 #
 
 var local_ready: bool = false
+
+var connected_to_server: bool = false
 
 
 #
@@ -109,24 +115,71 @@ func _ready() -> void:
 
 
 	#
-	# Initial UI.
+	# Initial lobby state.
 	#
 	status_label.text = \
 		"Not connected"
 
-	start_button.visible = false
+	connected_to_server = false
+
+	_set_lobby_options_visible(
+		false
+	)
 
 
 #
 # ============================================================
-# JOIN
+# CONNECTION UI
+# ============================================================
+#
+
+func _set_lobby_options_visible(
+	visible_state: bool
+) -> void:
+
+	#
+	# These elements only appear after
+	# successfully connecting to the server.
+	#
+	player_list.visible = \
+		visible_state
+
+	class_label.visible = \
+		visible_state
+
+	classes_container.visible = \
+		visible_state
+
+	ready_button.visible = \
+		visible_state
+
+
+	#
+	# Start is handled separately because
+	# only the lobby leader may see it.
+	#
+	if not visible_state:
+
+		start_button.visible = false
+
+
+#
+# ============================================================
+# JOIN SERVER
 # ============================================================
 #
 
 func _on_join_button_pressed() -> void:
 
+	if connected_to_server:
+		return
+
+
 	status_label.text = \
 		"Connecting..."
+
+
+	join_button.disabled = true
 
 
 	var error := \
@@ -141,30 +194,78 @@ func _on_join_button_pressed() -> void:
 		status_label.text = \
 			"Could not connect"
 
+		join_button.disabled = false
+
+
+#
+# ============================================================
+# CONNECTION EVENTS
+# ============================================================
+#
 
 func _on_connected_to_server() -> void:
+
+	connected_to_server = true
 
 	status_label.text = \
 		"Connected"
 
+
 	local_ready = false
+
 
 	ready_button.text = \
 		"Ready"
 
 
+	#
+	# Prevent trying to join again while
+	# already connected.
+	#
+	join_button.disabled = true
+
+
+	_set_lobby_options_visible(
+		true
+	)
+
+
 func _on_connection_failed() -> void:
+
+	connected_to_server = false
 
 	status_label.text = \
 		"Connection failed"
 
 
+	join_button.disabled = false
+
+
+	_set_lobby_options_visible(
+		false
+	)
+
+
 func _on_server_disconnected() -> void:
+
+	connected_to_server = false
+
+	local_ready = false
+
 
 	status_label.text = \
 		"Server disconnected"
 
-	start_button.visible = false
+
+	join_button.disabled = false
+
+	ready_button.text = \
+		"Ready"
+
+
+	_set_lobby_options_visible(
+		false
+	)
 
 
 #
@@ -175,9 +276,14 @@ func _on_server_disconnected() -> void:
 
 func _on_warlock_button_pressed() -> void:
 
+	if not connected_to_server:
+		return
+
+
 	NetworkManager.choose_class(
 		"warlock"
 	)
+
 
 	status_label.text = \
 		"Selected Warlock"
@@ -185,9 +291,14 @@ func _on_warlock_button_pressed() -> void:
 
 func _on_witch_button_pressed() -> void:
 
+	if not connected_to_server:
+		return
+
+
 	NetworkManager.choose_class(
 		"witch"
 	)
+
 
 	status_label.text = \
 		"Selected Witch"
@@ -195,11 +306,15 @@ func _on_witch_button_pressed() -> void:
 
 #
 # ============================================================
-# READY
+# READY STATE
 # ============================================================
 #
 
 func _on_ready_button_pressed() -> void:
+
+	if not connected_to_server:
+		return
+
 
 	local_ready = \
 		not local_ready
@@ -223,11 +338,19 @@ func _on_ready_button_pressed() -> void:
 
 #
 # ============================================================
-# START
+# START GAME
 # ============================================================
 #
 
 func _on_start_button_pressed() -> void:
+
+	if not connected_to_server:
+		return
+
+
+	if not NetworkManager.is_local_lobby_leader():
+		return
+
 
 	NetworkManager.request_start_game()
 
@@ -249,17 +372,17 @@ func _update_lobby() -> void:
 
 
 	#
-	# Sort peers so the player list doesn't
-	# jump around every update.
+	# Sort IDs for consistent display.
 	#
 	var peer_ids := \
 		NetworkManager.players.keys()
+
 
 	peer_ids.sort()
 
 
 	#
-	# Create one row per player.
+	# Build player list.
 	#
 	for peer_id in peer_ids:
 
@@ -326,12 +449,19 @@ func _update_lobby() -> void:
 
 
 	#
-	# Only the lobby leader gets the
-	# Start Game button.
+	# Only show Start when:
+	#
+	# 1. connected
+	# 2. this client is lobby leader
 	#
 	start_button.visible = \
-		NetworkManager.is_local_lobby_leader()
+		connected_to_server \
+		and NetworkManager.is_local_lobby_leader()
 
 
+	#
+	# The leader can only start once
+	# everyone is ready.
+	#
 	start_button.disabled = \
 		not NetworkManager.can_start_game()

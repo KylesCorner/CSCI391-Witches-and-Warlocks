@@ -7,22 +7,31 @@ const LOBBY_SCENE: String = \
 
 func _ready() -> void:
 
+	print("======================================")
+	print("BOOTSTRAP STARTED")
+	print("Dedicated feature: ",
+		OS.has_feature("dedicated_server")
+	)
+	print("User args: ",
+		OS.get_cmdline_user_args()
+	)
+	print("======================================")
+
+
 	var args := \
 		OS.get_cmdline_user_args()
 
 
-	#
-	# ========================================================
-	# DEDICATED SERVER
-	# ========================================================
-	#
+	var is_dedicated := \
+		OS.has_feature(
+			"dedicated_server"
+		) \
+		or "--dedicated" in args
 
-	if "--dedicated" in args:
 
-		print(
-			"Starting dedicated server..."
-		)
+	if is_dedicated:
 
+		print("DEDICATED SERVER MODE DETECTED")
 
 		var error := \
 			NetworkManager.start_dedicated_server()
@@ -31,41 +40,28 @@ func _ready() -> void:
 		if error != OK:
 
 			push_error(
-				"Dedicated server failed to start."
+				"Dedicated server failed: %s"
+				% error
 			)
 
 			get_tree().quit(1)
 
+			return
 
-		#
-		# Dedicated server stays in the
-		# Bootstrap scene until the server
-		# starts the actual game.
-		#
+
+		print(
+			"Dedicated server startup successful."
+		)
+
 		return
 
 
-	#
-	# ========================================================
-	# NORMAL CLIENT
-	# ========================================================
-	#
+	print("CLIENT MODE DETECTED")
 
-	#
-	# We cannot change scenes immediately
-	# inside _ready(), because Godot is
-	# still building the scene tree.
-	#
 	call_deferred(
 		"_load_lobby"
 	)
 
-
-#
-# ============================================================
-# LOAD CLIENT LOBBY
-# ============================================================
-#
 
 func _load_lobby() -> void:
 
@@ -78,6 +74,6 @@ func _load_lobby() -> void:
 	if error != OK:
 
 		push_error(
-			"Could not load lobby scene: %s"
+			"Could not load lobby: %s"
 			% error
 		)
