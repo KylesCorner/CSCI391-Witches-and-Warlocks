@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bedtclhtqmljx"]
+
+[ext_resource type="Script" uid="uid://bud4c8a1ugyj5" path="res://scripts/main.gd" id="1_o5qli"]
+
+[node name="Main" type="Node2D" unique_id=58767869]
+script = ExtResource("1_o5qli")
+
+[node name="Players" type="Node2D" parent="." unique_id=854325707]
+
+[node name="SpawnPoints" type="Node2D" parent="." unique_id=2080284948]
+
+[node name="Spawn1" type="Marker2D" parent="SpawnPoints" unique_id=1778203156]
+position = Vector2(27, 16)
+
+[node name="Spawn2" type="Marker2D" parent="SpawnPoints" unique_id=28776618]
+position = Vector2(-19, 15)
+
+[node name="Spawn3" type="Marker2D" parent="SpawnPoints" unique_id=1636646824]
+position = Vector2(21, -20)
+
+[node name="Spawn4" type="Marker2D" parent="SpawnPoints" unique_id=1360129082]
+position = Vector2(-16, -19)

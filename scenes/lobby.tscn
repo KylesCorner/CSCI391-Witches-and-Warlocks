@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://bcgjt5t0gvyer"]
+
+[ext_resource type="Script" uid="uid://2w1goq4bhunm" path="res://scripts/lobby.gd" id="1_o1atq"]
+
+[node name="Lobby" type="Control" unique_id=1410245764]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_o1atq")
+
+[node name="Panel" type="Panel" parent="." unique_id=1760412227]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=362834039]
+layout_mode = 0
+offset_left = 1.0
+offset_right = 162.0
+offset_bottom = 264.0
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer" unique_id=1957033637]
+layout_mode = 2
+text = "TITLE"
+
+[node name="PlayerName" type="LineEdit" parent="Panel/VBoxContainer" unique_id=1379912966]
+layout_mode = 2
+text = "Player Name"
+
+[node name="IPAddress" type="LineEdit" parent="Panel/VBoxContainer" unique_id=209833996]
+layout_mode = 2
+text = "127.0.0.1"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=2019714379]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1223526753]
+layout_mode = 2
+text = "HOST"
+
+[node name="JoinButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer" unique_id=1874653664]
+layout_mode = 2
+text = "JOIN"
+
+[node name="StatusLabel" type="Label" parent="Panel/VBoxContainer/HBoxContainer" unique_id=2093177097]
+layout_mode = 2
+text = "STATUS"
+
+[node name="PlayerList" type="VBoxContainer" parent="Panel/VBoxContainer" unique_id=673951120]
+layout_mode = 2
+
+[node name="ClassLabel" type="Label" parent="Panel/VBoxContainer" unique_id=2130044991]
+layout_mode = 2
+text = "CLASSES"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=1992906452]
+layout_mode = 2
+
+[node name="WarlockButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer2" unique_id=1712430899]
+layout_mode = 2
+text = "WARLOCK"
+
+[node name="WitchButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer2" unique_id=1660926608]
+layout_mode = 2
+text = "WITCH"
+
+[node name="ReadyButton" type="Button" parent="Panel/VBoxContainer" unique_id=1593272620]
+layout_mode = 2
+text = "READY"
+
+[node name="StartButton" type="Button" parent="Panel/VBoxContainer" unique_id=1210797474]
+layout_mode = 2
+text = "START"

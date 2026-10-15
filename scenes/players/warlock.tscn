@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://8h7ps6lhedmb"]
+
+[ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player_controller.gd" id="1_ue367"]
+[ext_resource type="SpriteFrames" uid="uid://oonc5y1fqy6j" path="res://assets/animations/blond_frames.tres" id="2_ue367"]
+[ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player_multiplayer_sync.gd" id="3_n2tkr"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_28di1"]
+radius = 9.055386
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gocbq"]
+size = Vector2(15, 12)
+
+[node name="Warlock" type="CharacterBody2D" unique_id=1749037957]
+script = ExtResource("1_ue367")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1216495168]
+sprite_frames = ExtResource("2_ue367")
+animation = &"Idle Front"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=779529829]
+position = Vector2(0, 6)
+shape = SubResource("CircleShape2D_28di1")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=642818378]
+
+[node name="MultiplayerSync" type="Node2D" parent="." unique_id=774479579]
+script = ExtResource("3_n2tkr")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=1861139125]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1610111241]
+position = Vector2(-0.5, 4)
+shape = SubResource("RectangleShape2D_gocbq")
