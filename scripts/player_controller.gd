@@ -18,25 +18,16 @@ signal state_changed(new_state: PlayerState)
 # ============================================================
 #
 
-#
-# Each inherited player scene overrides this.
-#
-# Examples:
-#   warlock
-#   witch
-#   wizard
-#   knight
-#
 @export var class_id: String = "base"
 
+@export var speed: float = 100.0
+
 
 #
-# Generic movement speed.
+# Name received from the lobby when this
+# player is spawned.
 #
-# Individual classes can override this in
-# their inherited scene.
-#
-@export var speed: float = 100.0
+var display_name: String = "Player"
 
 
 #
@@ -55,6 +46,10 @@ signal state_changed(new_state: PlayerState)
 
 @onready var camera: Camera2D = \
 	$Camera2D
+
+
+@onready var name_label: Label = \
+	$NameLabel
 
 
 #
@@ -113,8 +108,15 @@ func _ready() -> void:
 
 
 	#
-	# Only the player owned by this client
-	# gets an active camera.
+	# Apply the lobby/player name.
+	#
+	name_label.text = \
+		display_name
+
+
+	#
+	# Only the locally controlled player
+	# should have an active camera.
 	#
 	if is_multiplayer_authority():
 
@@ -132,6 +134,39 @@ func _ready() -> void:
 
 #
 # ============================================================
+# DISPLAY NAME
+# ============================================================
+#
+
+func set_display_name(
+	new_name: String
+) -> void:
+
+	var clean_name := \
+		new_name.strip_edges()
+
+
+	if clean_name.is_empty():
+
+		clean_name = "Player"
+
+
+	display_name = \
+		clean_name
+
+
+	#
+	# This allows the name to be changed
+	# after _ready() too.
+	#
+	if is_node_ready():
+
+		name_label.text = \
+			display_name
+
+
+#
+# ============================================================
 # PHYSICS
 # ============================================================
 #
@@ -141,8 +176,8 @@ func _physics_process(
 ) -> void:
 
 	#
-	# Remote players are driven by the
-	# multiplayer synchronization script.
+	# Remote players are updated by
+	# PlayerMultiplayerSync.
 	#
 	if not is_multiplayer_authority():
 		return
@@ -171,9 +206,6 @@ func _physics_process(
 			_process_dead()
 
 
-	#
-	# Generic interaction button.
-	#
 	if Input.is_action_just_pressed(
 		"interact"
 	):
@@ -284,14 +316,10 @@ func change_state(
 
 #
 # ============================================================
-# NETWORK STATE APPLICATION
+# NETWORK STATE
 # ============================================================
 #
 
-#
-# Called by PlayerMultiplayerSync on
-# remote copies of this player.
-#
 func apply_network_state(
 	new_state: int,
 	new_facing_direction: int
@@ -498,10 +526,6 @@ func play_state_animation(
 
 	else:
 
-		#
-		# Attack / Hurt / Dead animations
-		# are optional for now.
-		#
 		play_idle_animation()
 
 
@@ -613,7 +637,7 @@ func _get_closest_interactable() -> Node:
 
 
 	#
-	# Check Area2D interactables.
+	# Area2D interactables.
 	#
 	for area in \
 			interaction_area.get_overlapping_areas():
@@ -621,10 +645,6 @@ func _get_closest_interactable() -> Node:
 		var target: Node = area
 
 
-		#
-		# Sometimes the Area2D itself isn't
-		# the interactable, but its parent is.
-		#
 		if not target.is_in_group(
 			"interactable"
 		):
@@ -673,7 +693,7 @@ func _get_closest_interactable() -> Node:
 
 
 	#
-	# Check physics-body interactables.
+	# Physics-body interactables.
 	#
 	for body in \
 			interaction_area.get_overlapping_bodies():

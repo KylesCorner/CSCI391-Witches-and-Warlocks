@@ -3,7 +3,7 @@ extends Node2D
 
 #
 # ============================================================
-# PLAYER CLASSES
+# PLAYER SCENES
 # ============================================================
 #
 
@@ -46,6 +46,10 @@ const PLAYER_SCENES := {
 
 func _ready() -> void:
 
+	#
+	# Only the dedicated server performs
+	# the authoritative player spawning.
+	#
 	if multiplayer.is_server():
 
 		NetworkManager.all_players_loaded.connect(
@@ -54,8 +58,8 @@ func _ready() -> void:
 
 
 	#
-	# Give the scene one frame to fully
-	# enter the tree.
+	# Give the scene one frame to finish
+	# entering the scene tree.
 	#
 	await get_tree().process_frame
 
@@ -65,7 +69,7 @@ func _ready() -> void:
 
 #
 # ============================================================
-# SPAWN EVERYONE
+# SPAWN ALL PLAYERS
 # ============================================================
 #
 
@@ -82,15 +86,31 @@ func _spawn_all_players() -> void:
 	peer_ids.sort()
 
 
-	var spawn_index := 0
+	var spawn_index: int = 0
 
 
 	for peer_id in peer_ids:
 
 		var player_info: Dictionary = \
-			NetworkManager.players[peer_id]
+			NetworkManager.players[
+				peer_id
+			]
 
 
+		#
+		# Player name entered in lobby.
+		#
+		var display_name := str(
+			player_info.get(
+				"name",
+				"Player"
+			)
+		)
+
+
+		#
+		# Selected class.
+		#
 		var selected_class := str(
 			player_info.get(
 				"class",
@@ -101,6 +121,7 @@ func _spawn_all_players() -> void:
 
 		spawn_player.rpc(
 			int(peer_id),
+			display_name,
 			selected_class,
 			spawn_index
 		)
@@ -111,7 +132,7 @@ func _spawn_all_players() -> void:
 
 #
 # ============================================================
-# SPAWN ONE
+# SPAWN PLAYER
 # ============================================================
 #
 
@@ -122,10 +143,14 @@ func _spawn_all_players() -> void:
 )
 func spawn_player(
 	peer_id: int,
+	display_name: String,
 	selected_class: String,
 	spawn_index: int
 ) -> void:
 
+	#
+	# Validate class.
+	#
 	if not PLAYER_SCENES.has(
 		selected_class
 	):
@@ -138,44 +163,83 @@ func spawn_player(
 		return
 
 
-	if spawn_index >= \
+	#
+	# Validate spawn point.
+	#
+	if spawn_index < 0 \
+	or spawn_index >= \
 			spawn_points.size():
 
 		push_error(
-			"Not enough spawn points."
+			"Invalid spawn point index: %s"
+			% spawn_index
 		)
 
 		return
 
 
-	var player_name := \
+	var network_node_name := \
 		str(peer_id)
 
 
+	#
+	# Prevent accidental duplicate spawning.
+	#
 	if players_node.has_node(
-		NodePath(player_name)
+		NodePath(
+			network_node_name
+		)
 	):
 
 		return
 
 
 	var player_scene: PackedScene = \
-		PLAYER_SCENES[selected_class]
+		PLAYER_SCENES[
+			selected_class
+		]
 
 
-	var player := \
-		player_scene.instantiate()
+	var player: PlayerController = \
+		player_scene.instantiate() \
+		as PlayerController
+
+
+	if player == null:
+
+		push_error(
+			"Player scene '%s' does not inherit PlayerController."
+			% selected_class
+		)
+
+		return
 
 
 	#
-	# Matching names across every machine.
+	# Every peer must use the same node name
+	# so RPC paths match.
 	#
 	player.name = \
-		player_name
+		network_node_name
 
 
 	#
-	# Client owns its own character.
+	# Give the player its lobby name.
+	#
+	# This happens before add_child(), so
+	# _ready() sees the correct value.
+	#
+	player.set_display_name(
+		display_name
+	)
+
+
+	#
+	# Give this player's client authority
+	# over its player node.
+	#
+	# recursive = true also gives authority
+	# to MultiplayerSync.
 	#
 	player.set_multiplayer_authority(
 		peer_id,
@@ -183,11 +247,17 @@ func spawn_player(
 	)
 
 
+	#
+	# Add player to scene.
+	#
 	players_node.add_child(
 		player
 	)
 
 
+	#
+	# Move to assigned spawn point.
+	#
 	player.global_position = \
 		spawn_points[
 			spawn_index
@@ -195,8 +265,10 @@ func spawn_player(
 
 
 	print(
-		"Spawned peer ",
+		"Spawned ",
+		display_name,
+		" [",
 		peer_id,
-		" as ",
+		"] as ",
 		selected_class
 	)

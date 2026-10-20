@@ -32,3 +32,10 @@ script = ExtResource("2_vitqv")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1962315159]
 position = Vector2(0, 6)
 shape = SubResource("RectangleShape2D_2dw7i")
+
+[node name="NameLabel" type="Label" parent="." unique_id=1447221165]
+offset_left = -28.0
+offset_top = -25.0
+offset_right = 30.0
+offset_bottom = -2.0
+text = "PLAYER"
