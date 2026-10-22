@@ -129,7 +129,6 @@ func _spawn_all_players() -> void:
 
 		spawn_index += 1
 
-
 #
 # ============================================================
 # SPAWN PLAYER

@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://ctku8dm2jhbwo"]
+
+[node name="PlayerTag" type="Node2D" unique_id=1777858519]
+
+[node name="NameLabel" type="Label" parent="." unique_id=1846792108]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -29.0
+offset_top = -23.0
+offset_right = 29.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "PLAYER"
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=2106930808]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -38.0
+offset_right = 38.0
+offset_bottom = 6.0
+grow_horizontal = 2
+step = 1.0
+value = 100.0
+show_percentage = false

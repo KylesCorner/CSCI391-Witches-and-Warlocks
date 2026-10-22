@@ -3,6 +3,7 @@
 [ext_resource type="SpriteFrames" uid="uid://080rtq7hyanu" path="res://assets/animations/blue_hair_woman.tres" id="1_ggyfd"]
 [ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player_controller.gd" id="1_vitqv"]
 [ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player_multiplayer_sync.gd" id="2_vitqv"]
+[ext_resource type="PackedScene" uid="uid://ctku8dm2jhbwo" path="res://scenes/players/player_tag.tscn" id="4_kvbc1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_28di1"]
 
@@ -33,9 +34,5 @@ script = ExtResource("2_vitqv")
 position = Vector2(0, 6)
 shape = SubResource("RectangleShape2D_2dw7i")
 
-[node name="NameLabel" type="Label" parent="." unique_id=1447221165]
-offset_left = -28.0
-offset_top = -25.0
-offset_right = 30.0
-offset_bottom = -2.0
-text = "PLAYER"
+[node name="PlayerTag" parent="." unique_id=1777858519 instance=ExtResource("4_kvbc1")]
+position = Vector2(0, -16)

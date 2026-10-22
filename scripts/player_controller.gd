@@ -10,7 +10,7 @@ extends CharacterBody2D
 
 signal interact_requested
 signal state_changed(new_state: PlayerState)
-
+signal health_changed(current: int, maximum: int)
 
 #
 # ============================================================
@@ -49,7 +49,18 @@ var display_name: String = "Player"
 
 
 @onready var name_label: Label = \
-	$NameLabel
+	$PlayerTag/NameLabel
+	
+@onready var health_bar: ProgressBar = \
+	$PlayerTag/HealthBar
+
+# ============================================================
+# HEALTH
+# ============================================================
+
+@export var max_health: int = 100
+
+var current_health: int = 100
 
 
 #
@@ -112,6 +123,15 @@ func _ready() -> void:
 	#
 	name_label.text = \
 		display_name
+		
+	# Initialize player health.
+	current_health = max_health
+
+	# Connect health changes to the UI.
+	health_changed.connect(_update_health_bar)
+
+	# Display initial health.
+	_update_health_bar(current_health, max_health)
 
 
 	#
@@ -138,6 +158,7 @@ func _ready() -> void:
 # ============================================================
 #
 
+	
 func set_display_name(
 	new_name: String
 ) -> void:
@@ -269,15 +290,80 @@ func _process_attacking() -> void:
 
 #
 # ============================================================
-# HURT
+# HURT AND HEALTH
 # ============================================================
 #
+# ============================================================
+# MULTIPLAYER HEALTH SYNC
+# ============================================================
 
+@rpc("any_peer", "call_remote", "reliable")
+func sync_health(new_health: int) -> void:
+
+	# Peer 1 is always our dedicated server.
+	# Ignore health updates from other clients.
+	if multiplayer.get_remote_sender_id() != 1:
+		return
+
+	_set_health_local(new_health)
+func _update_health_bar(
+	current: int,
+	maximum: int
+) -> void:
+
+	health_bar.max_value = maximum
+	health_bar.value = current
+	
+func _set_health_local(value: int) -> void:
+
+	var new_health := clampi(
+		value,
+		0,
+		max_health
+	)
+
+	if new_health == current_health:
+		return
+
+	current_health = new_health
+
+	health_changed.emit(
+		current_health,
+		max_health
+	)
 func _process_hurt() -> void:
 
 	velocity = Vector2.ZERO
 
+func take_damage(amount: int) -> void:
+	if not multiplayer.is_server():
+		return
 
+	if amount <= 0:
+		return
+
+	var old_health := current_health
+
+	_set_health_local(current_health - amount)
+
+	if current_health != old_health:
+		sync_health.rpc(current_health)
+		
+
+
+func heal(amount: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	if amount <= 0:
+		return
+
+	var old_health := current_health
+
+	_set_health_local(current_health + amount)
+
+	if current_health != old_health:
+		sync_health.rpc(current_health)
 #
 # ============================================================
 # DEAD
