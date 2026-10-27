@@ -15,6 +15,10 @@ enum TaskKind {
 @export var task_kind: TaskKind
 # sprites should be one per task, ordered as the task kind enum shows
 @export var sprites: Array[Texture2D] = []
+# optional region per sprite; Rect2() (empty size) means no region
+@export var sprite_regions: Array[Rect2] = [
+	Rect2(0, 0, 100, 125), # CONTACT_PATRON
+]
 
 @onready var sprite = $Sprite2D
 
@@ -46,6 +50,12 @@ func _set_sprite(index: int) -> void:
 		return
 
 	sprite.texture = sprites[index]
+
+	if index < sprite_regions.size() and sprite_regions[index].size != Vector2.ZERO:
+		sprite.region_enabled = true
+		sprite.region_rect = sprite_regions[index]
+	else:
+		sprite.region_enabled = false
 
 
 func _process(delta: float) -> void:
