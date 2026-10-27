@@ -1,4 +1,4 @@
-extends StaticBody2D
+extends Area2D
 
 enum TaskKind {
 	CONTACT_PATRON,
@@ -23,6 +23,8 @@ enum TaskKind {
 @onready var sprite = $Sprite2D
 
 func _ready() -> void:
+	body_entered.connect(_on_body_entered)
+
 	match task_kind:
 		TaskKind.CONTACT_PATRON:
 			_set_sprite(0)
@@ -58,5 +60,17 @@ func _set_sprite(index: int) -> void:
 		sprite.region_enabled = false
 
 
-func _process(delta: float) -> void:
-	pass
+func _on_body_entered(body: Node2D) -> void:
+	if body is not PlayerController:
+		return
+
+	var player := body as PlayerController
+
+	# Only the locally controlled player starts their own task state.
+	if not player.is_multiplayer_authority():
+		return
+
+	if player.state == PlayerController.PlayerState.IN_TASK:
+		return
+
+	player.start_task()
