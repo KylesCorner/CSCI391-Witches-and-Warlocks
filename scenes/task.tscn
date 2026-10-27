@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://d2f5o5ruyxked"]
+
+[ext_resource type="Script" uid="uid://fcwoniwvrgxd" path="res://scripts/task.gd" id="1_kolu2"]
+[ext_resource type="Texture2D" uid="uid://cv60agkqs4xjj" path="res://assets/Witch Assets/Freebies/rainboworb.png" id="2_3qeyo"]
+[ext_resource type="Texture2D" uid="uid://hrjt1m8v0aut" path="res://assets/Warlock Assets/PSXGrimoireFBX/Grimoire.png" id="3_qe5cv"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dxwoq"]
+
+[node name="Task" type="StaticBody2D" unique_id=1550255939]
+script = ExtResource("1_kolu2")
+task_kind = null
+sprites = Array[Texture2D]([ExtResource("3_qe5cv"), ExtResource("2_3qeyo")])
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=130165403]
+shape = SubResource("CircleShape2D_dxwoq")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1035526762]
+position = Vector2(-5.9604645e-08, 1.4210855e-14)
+scale = Vector2(0.15151516, 0.16129033)
+region_enabled = true
+region_rect = Rect2(0, 0, 99, 124.5)
