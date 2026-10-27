@@ -149,6 +149,11 @@ func _ready() -> void:
 		camera.enabled = false
 
 
+	# Only show overhead name and health for other players.
+	# The owning client uses PlayerHUD instead.
+	$PlayerTag.visible = not is_multiplayer_authority()
+
+
 	_update_current_animation()
 
 
@@ -687,26 +692,34 @@ func change_animation(
 # ============================================================
 #
 
+
 func interact() -> void:
 
-	var target := \
-		_get_closest_interactable()
+	print("E PRESSED — checking interactions")
 
+	var areas := interaction_area.get_overlapping_areas()
+
+	print("Overlapping areas: ", areas.size())
+
+	for area in areas:
+		print(
+			"Detected: ", area.name,
+			" | Groups: ", area.get_groups()
+		)
+
+	var target := _get_closest_interactable()
 
 	if target == null:
+		print("No valid interactable found!")
 		return
 
+	print("Found interactable: ", target.name)
 
 	interact_requested.emit()
 
+	if target.has_method("interact"):
+		target.interact(self)
 
-	if target.has_method(
-		"interact"
-	):
-
-		target.interact(
-			self
-		)
 
 
 #

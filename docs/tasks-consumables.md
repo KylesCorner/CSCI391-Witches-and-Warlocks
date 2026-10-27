@@ -12,7 +12,7 @@ The tasks (t1, ..., t4) required for each consumable (c1, ..., c4) are decided a
 ```raw
 c1 | t1 | t2 |
 c2 | t3 | t4 |
-     c3   c4
+	 c3   c4
 ```
 
 If you perform a row of tasks (t1 and t2/t3 and t4), you get the consumable in that row and likewise for the columns.
@@ -20,7 +20,7 @@ If you perform a row of tasks (t1 and t2/t3 and t4), you get the consumable in t
 ## Warlock Tasks
 
 1. Contact patron: stand in front of a etherial shape/body
-    - Alternatively, talk on the phone
+	- Alternatively, talk on the phone
 2. Make sacrifice: kill a goat
 3. Pick a rune: pick one from a bunch on a table
 4. Channel a spell: stand still and "absorb" some particles

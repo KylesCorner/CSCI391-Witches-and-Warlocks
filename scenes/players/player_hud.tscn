@@ -1,0 +1,122 @@
+[gd_scene format=3 uid="uid://b5mmp8l5sj0t4"]
+
+[ext_resource type="Script" uid="uid://claq1wu8ak705" path="res://scripts/player_hud.gd" id="1_5ia86"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7g1y0"]
+bg_color = Color(1, 0, 0, 1)
+
+[node name="PlayerHud" type="CanvasLayer" unique_id=991395983]
+script = ExtResource("1_5ia86")
+
+[node name="HUDRoot" type="Control" parent="." unique_id=620186691]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HUDRoot" unique_id=1827470463]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Layout" type="VBoxContainer" parent="HUDRoot/MarginContainer" unique_id=307442702]
+layout_mode = 2
+
+[node name="TopRow" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout" unique_id=1794618986]
+layout_mode = 2
+
+[node name="PlayerPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=1094220449]
+layout_mode = 2
+
+[node name="InfoVBox" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel" unique_id=252419274]
+layout_mode = 2
+
+[node name="PlayerName" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=27743338]
+layout_mode = 2
+text = "PLAYER NAME"
+
+[node name="ClassName" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=295429892]
+layout_mode = 2
+text = "CLASS NAME"
+
+[node name="HealthBar" type="ProgressBar" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=386025234]
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_7g1y0")
+show_percentage = false
+
+[node name="HealthText" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=1024664354]
+layout_mode = 2
+text = "100/100"
+
+[node name="HorizontalSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=608662025]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TaskPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=1873647753]
+layout_mode = 2
+
+[node name="TasksVBox" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel" unique_id=1542328226]
+layout_mode = 2
+
+[node name="TaskTitle" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=918091252]
+layout_mode = 2
+text = "Tasks"
+
+[node name="Task1" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=6754907]
+layout_mode = 2
+text = "TASK 1"
+
+[node name="Task2" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=243269071]
+layout_mode = 2
+text = "TASK 2"
+
+[node name="Task3" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=1477459569]
+layout_mode = 2
+text = "TASK 3"
+
+[node name="Task4" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=159939455]
+layout_mode = 2
+text = "TASK 4"
+
+[node name="VerticalSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout" unique_id=966473589]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+
+[node name="BottomRow" type="HBoxContainer" parent="HUDRoot/MarginContainer/Layout" unique_id=1500803056]
+layout_mode = 2
+
+[node name="LeftSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=1212118618]
+layout_mode = 2
+
+[node name="AbilityPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=710468199]
+layout_mode = 2
+
+[node name="AbilitySlots" type="HBoxContainer" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel" unique_id=110914623]
+layout_mode = 2
+
+[node name="Slot1" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=946846410]
+layout_mode = 2
+text = "Ability 1"
+
+[node name="Slot2" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=408560010]
+layout_mode = 2
+text = "Ability 2"
+
+[node name="Slot3" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=1929350594]
+layout_mode = 2
+text = "Ability 3"
+
+[node name="Slot4" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=1093913867]
+layout_mode = 2
+text = "Ability 4"
+
+[node name="RightSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=1317148492]
+layout_mode = 2

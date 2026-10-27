@@ -1,3 +1,4 @@
+
 extends Node2D
 
 
@@ -8,21 +9,29 @@ extends Node2D
 #
 
 const PLAYER_SCENES := {
-	"warlock":
-		preload(
-			"res://scenes/players/warlock.tscn"
-		),
+	"warlock": preload(
+		"res://scenes/players/warlock.tscn"
+	),
 
-	"witch":
-		preload(
-			"res://scenes/players/witch.tscn"
-		)
+	"witch": preload(
+		"res://scenes/players/witch.tscn"
+	)
 }
 
 
 #
 # ============================================================
-# NODES
+# HUD SCENE
+# ============================================================
+#
+
+const PLAYER_HUD_SCENE: PackedScene = \
+	preload("res://scenes/players/player_hud.tscn")
+
+
+#
+# ============================================================
+# NODE REFERENCES
 # ============================================================
 #
 
@@ -47,8 +56,8 @@ const PLAYER_SCENES := {
 func _ready() -> void:
 
 	#
-	# Only the dedicated server performs
-	# the authoritative player spawning.
+	# Only the dedicated server handles
+	# authoritative player spawning.
 	#
 	if multiplayer.is_server():
 
@@ -56,13 +65,10 @@ func _ready() -> void:
 			_spawn_all_players
 		)
 
-
 	#
-	# Give the scene one frame to finish
-	# entering the scene tree.
+	# Allow the scene tree to finish loading.
 	#
 	await get_tree().process_frame
-
 
 	NetworkManager.report_game_loaded()
 
@@ -78,27 +84,19 @@ func _spawn_all_players() -> void:
 	if not multiplayer.is_server():
 		return
 
-
-	var peer_ids := \
-		NetworkManager.players.keys()
-
+	var peer_ids := NetworkManager.players.keys()
 
 	peer_ids.sort()
 
-
 	var spawn_index: int = 0
-
 
 	for peer_id in peer_ids:
 
 		var player_info: Dictionary = \
-			NetworkManager.players[
-				peer_id
-			]
-
+			NetworkManager.players[peer_id]
 
 		#
-		# Player name entered in lobby.
+		# Player's lobby name.
 		#
 		var display_name := str(
 			player_info.get(
@@ -107,9 +105,8 @@ func _spawn_all_players() -> void:
 			)
 		)
 
-
 		#
-		# Selected class.
+		# Selected player class.
 		#
 		var selected_class := str(
 			player_info.get(
@@ -118,7 +115,9 @@ func _spawn_all_players() -> void:
 			)
 		)
 
-
+		#
+		# Spawn the player on all peers.
+		#
 		spawn_player.rpc(
 			int(peer_id),
 			display_name,
@@ -126,8 +125,12 @@ func _spawn_all_players() -> void:
 			spawn_index
 		)
 
-
 		spawn_index += 1
+		
+		# Start the gameplay loop after all player
+		# spawn RPCs have been issued.
+		MatchManager.start_match()
+
 
 #
 # ============================================================
@@ -135,11 +138,7 @@ func _spawn_all_players() -> void:
 # ============================================================
 #
 
-@rpc(
-	"authority",
-	"call_local",
-	"reliable"
-)
+@rpc("authority", "call_local", "reliable")
 func spawn_player(
 	peer_id: int,
 	display_name: String,
@@ -148,11 +147,9 @@ func spawn_player(
 ) -> void:
 
 	#
-	# Validate class.
+	# Validate selected class.
 	#
-	if not PLAYER_SCENES.has(
-		selected_class
-	):
+	if not PLAYER_SCENES.has(selected_class):
 
 		push_error(
 			"Unknown player class: %s"
@@ -161,13 +158,11 @@ func spawn_player(
 
 		return
 
-
 	#
-	# Validate spawn point.
+	# Validate spawn location.
 	#
 	if spawn_index < 0 \
-	or spawn_index >= \
-			spawn_points.size():
+	or spawn_index >= spawn_points.size():
 
 		push_error(
 			"Invalid spawn point index: %s"
@@ -176,33 +171,29 @@ func spawn_player(
 
 		return
 
-
-	var network_node_name := \
-		str(peer_id)
-
+	#
+	# Ensure every peer uses the same
+	# player node name for RPC paths.
+	#
+	var network_node_name := str(peer_id)
 
 	#
-	# Prevent accidental duplicate spawning.
+	# Prevent duplicate spawning.
 	#
 	if players_node.has_node(
-		NodePath(
-			network_node_name
-		)
+		NodePath(network_node_name)
 	):
 
 		return
 
-
+	#
+	# Instantiate the selected class.
+	#
 	var player_scene: PackedScene = \
-		PLAYER_SCENES[
-			selected_class
-		]
-
+		PLAYER_SCENES[selected_class]
 
 	var player: PlayerController = \
-		player_scene.instantiate() \
-		as PlayerController
-
+		player_scene.instantiate() as PlayerController
 
 	if player == null:
 
@@ -213,31 +204,22 @@ func spawn_player(
 
 		return
 
+	#
+	# Assign the network identity.
+	#
+	player.name = network_node_name
 
 	#
-	# Every peer must use the same node name
-	# so RPC paths match.
+	# Set player information BEFORE
+	# adding it to the scene tree.
 	#
-	player.name = \
-		network_node_name
+	player.set_display_name(display_name)
 
-
-	#
-	# Give the player its lobby name.
-	#
-	# This happens before add_child(), so
-	# _ready() sees the correct value.
-	#
-	player.set_display_name(
-		display_name
-	)
-
+	player.class_id = selected_class
 
 	#
-	# Give this player's client authority
-	# over its player node.
-	#
-	# recursive = true also gives authority
+	# The owning client controls movement.
+	# Recursive authority also applies
 	# to MultiplayerSync.
 	#
 	player.set_multiplayer_authority(
@@ -245,23 +227,16 @@ func spawn_player(
 		true
 	)
 
+	#
+	# Add the player to the scene.
+	#
+	players_node.add_child(player)
 
 	#
-	# Add player to scene.
-	#
-	players_node.add_child(
-		player
-	)
-
-
-	#
-	# Move to assigned spawn point.
+	# Assign the spawn position.
 	#
 	player.global_position = \
-		spawn_points[
-			spawn_index
-		].global_position
-
+		spawn_points[spawn_index].global_position
 
 	print(
 		"Spawned ",
@@ -270,4 +245,80 @@ func spawn_player(
 		peer_id,
 		"] as ",
 		selected_class
+	)
+
+	#
+	# Create the HUD only on the
+	# player's own client.
+	#
+	_create_local_player_hud(
+		player,
+		peer_id
+	)
+
+
+#
+# ============================================================
+# CREATE LOCAL PLAYER HUD
+# ============================================================
+#
+
+func _create_local_player_hud(
+	player: PlayerController,
+	peer_id: int
+) -> void:
+
+	#
+	# Dedicated servers do not need UI.
+	#
+	if multiplayer.is_server():
+		return
+
+	#
+	# Only create a HUD for the
+	# locally controlled player.
+	#
+	if peer_id != multiplayer.get_unique_id():
+		return
+
+	#
+	# Prevent duplicate HUD instances.
+	#
+	if has_node("PlayerHUD"):
+		return
+
+	#
+	# Instantiate the shared HUD.
+	#
+	var hud: PlayerHUD = \
+		PLAYER_HUD_SCENE.instantiate() as PlayerHUD
+
+	if hud == null:
+
+		push_error(
+			"Failed to instantiate PlayerHUD."
+		)
+
+		return
+
+	#
+	# Add HUD to Main, not BasePlayer.
+	#
+	hud.name = "PlayerHUD"
+
+	add_child(hud)
+
+	#
+	# Bind the HUD to this player's state.
+	# This connects health_changed
+	# and initializes class-specific UI.
+	#
+	hud.bind_player(player)
+
+	print(
+		"Created local HUD for ",
+		player.display_name,
+		" (",
+		player.class_id,
+		")"
 	)
