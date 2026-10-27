@@ -12,7 +12,7 @@ The tasks (t1, ..., t4) required for each consumable (c1, ..., c4) are decided a
 ```raw
 c1 | t1 | t2 |
 c2 | t3 | t4 |
-     c3   c4
+	 c3   c4
 ```
 
 If you perform a row of tasks (t1 and t2/t3 and t4), you get the consumable in that row and likewise for the columns.
@@ -20,7 +20,7 @@ If you perform a row of tasks (t1 and t2/t3 and t4), you get the consumable in t
 ## Warlock Tasks
 
 1. Contact patron: stand in front of a etherial shape/body
-    - Alternatively, talk on the phone
+	- Alternatively, talk on the phone
 2. Make sacrifice: kill a goat
 3. Pick a rune: pick one from a bunch on a table
 4. Channel a spell: stand still and "absorb" some particles
@@ -49,60 +49,60 @@ If you perform a row of tasks (t1 and t2/t3 and t4), you get the consumable in t
 3. Spontaneously detonating potion: trap potion
 4. Invisibility
 
-# Shopping list (hi Ingrid)
+# Shopping list (hi Ingrid) (hi back, I am on it)
 
 ## Warlock tasks
 
 ### Contact patron
-- [ ] Ethereal patron body sprite or telephone
-- [ ] Whisper / contact sound
+- [x] Ethereal patron body sprite or telephone
+- [x] Whisper / contact sound
 
 ### Make sacrifice
-- [ ] Goat sprite
-- [ ] Knife sprite
-- [ ] Knife *chunk* or squeel sound
+- [x] Goat sprite
+- [x] Knife sprite
+- [x] Knife *chunk* or squeel sound
 
 ### Pick a rune
-- [ ] Rune sprite (a few variants)
-- [ ] Rune pickup sound
+- [x] Rune sprite (a few variants)
+- [x] Rune pickup sound
 
 ### Channel a spell
-- [ ] Particle / channeling sprite
-- [ ] Channeling hum sound
+- [x] Particle / channeling sprite (grimoire.png)
+- [x] Channeling hum sound
 
 ## Witch tasks
 
 ### Stir cauldron
-- [ ] Cauldron sprite (empty)
-- [ ] Cauldron sprite (full / bubbling)
+- [x] Cauldron sprite (empty)
+- [ ] Cauldron sprite (full / bubbling) (Can't find maybe fill the one I added')
 
 ### Collect poison berries
-- [ ] Berry sprite
-- [ ] Berry bush sprite
-- [ ] Pick berry sound
+- [x] Berry sprite (MiscItems.gif)
+- [x] Berry bush sprite
+- [x] Pick berry sound
 
 ### Pet the black cat
-- [ ] Black cat sprite
-- [ ] Heart sprite
-- [ ] Cat purr / meow sound
+- [x] Black cat sprite
+- [x] Heart sprite
+- [x] Cat purr / meow sound
 
 ### Find a clean flask
-- [ ] Clean flask sprite
-- [ ] Flask clink sound
+- [x] Clean flask sprite (white potion bottle potions.gif)
+- [x] Flask clink sound
 
 ## Warlock spells
 
 ### AWP (sniper spell)
-- [ ] Sniper bolt / projectile sprite
+- [x] Sniper bolt / projectile sprite
 - [ ] Shot sound
 
 ### I CAST FIREBALL
-- [ ] Fire/explosion sprite (will duplicate it for the area effected)
-- [ ] Fireball boom sound
+- [x] Fire/explosion sprite (will duplicate it for the area effected)
+- [x] Fireball boom sound
 - [ ] I CAST FIREBALL meme sound
 
 ### Summon husk
-- [ ] Husk follower sprite
+- [x] Husk follower sprite
 - [ ] Summon sound
 
 ### Invisibility
@@ -111,15 +111,15 @@ If you perform a row of tasks (t1 and t2/t3 and t4), you get the consumable in t
 ## Witch potions
 
 ### Poison
-- [ ] Green potion sprite
-- [ ] Poison cloud / splash sprite
-- [ ] Glass breaking sound
+- [x] Green potion sprite (potions.gif)
+- [x] Poison cloud / splash sprite
+- [x] Glass breaking sound
 
 ### Murder cat
 - [ ] Cat hiss / attack sound
 
 ### Spontaneously detonating potion
-- [ ] Red potion flask sprite
+- [x] Dark Pink potion flask sprite (potions.gif)
 - [ ] Detonation sound
 
 ### Invisibility
