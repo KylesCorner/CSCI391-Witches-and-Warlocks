@@ -12,6 +12,18 @@ enum TaskKind {
 	OH_GOD_OH_FUCK
 }
 
+@export var task_durations: Array[float] = [
+   2, # CONTACT_PATRON
+   2, # MAKE_SACRIFICE
+   2, # PICK_RUNE
+   2, # CHANNEL_SPELL
+   2, # STIR_CAULDRON
+   2, # COLLECT_POISON_BERRIES
+   2, # PET_BLACK_CAT
+   2, # FIND_CLEAN_FLASK
+   2, # OH_GOD_OH_FUCK
+]
+
 @export var task_kind: TaskKind
 # sprites should be one per task, ordered as the task kind enum shows
 @export var sprites: Array[Texture2D] = []
@@ -73,4 +85,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if player.state == PlayerController.PlayerState.IN_TASK:
 		return
 
-	player.start_task()
+	var index = int(task_kind)
+	if index >= 0 and index < task_durations.size():
+		player.start_task(task_durations[int(task_kind)])
+		push_warning("Task %s is missing task_durations[%d]" % [TaskKind.keys()[task_kind], index])

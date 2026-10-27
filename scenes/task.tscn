@@ -7,20 +7,20 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_dxwoq"]
 radius = 15.0
 
-[node name="Task" type="Area2D"]
+[node name="Task" type="Area2D" unique_id=2135331504]
 collision_layer = 0
-collision_mask = 1
-monitoring = true
 monitorable = false
 script = ExtResource("1_kolu2")
 sprites = Array[Texture2D]([ExtResource("3_qe5cv"), ExtResource("2_3qeyo")])
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=496680221]
 shape = SubResource("CircleShape2D_dxwoq")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1723601782]
 position = Vector2(-5.9604645e-08, 1.4210855e-14)
 scale = Vector2(0.15151516, 0.16129033)
 texture = ExtResource("3_qe5cv")
 region_enabled = true
 region_rect = Rect2(0, 0, 100, 125)
+
+[connection signal="body_shape_entered" from="." to="." method="_on_body_entered"]
