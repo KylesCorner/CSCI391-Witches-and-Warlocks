@@ -35,7 +35,7 @@ enum TaskKind {
 @onready var sprite = $Sprite2D
 
 func _ready() -> void:
-	body_entered.connect(_on_body_entered)
+	add_to_group("interactable")
 
 	match task_kind:
 		TaskKind.CONTACT_PATRON:
@@ -72,20 +72,22 @@ func _set_sprite(index: int) -> void:
 		sprite.region_enabled = false
 
 
-func _on_body_entered(body: Node2D) -> void:
-	if body is not PlayerController:
+func interact(player: Node) -> void:
+	if player is not PlayerController:
 		return
 
-	var player := body as PlayerController
+	var player_controller := player as PlayerController
 
 	# Only the locally controlled player starts their own task state.
-	if not player.is_multiplayer_authority():
+	if not player_controller.is_multiplayer_authority():
 		return
 
-	if player.state == PlayerController.PlayerState.IN_TASK:
+	if player_controller.state == PlayerController.PlayerState.IN_TASK:
 		return
 
-	var index = int(task_kind)
-	if index >= 0 and index < task_durations.size():
-		player.start_task(task_durations[int(task_kind)])
+	var index := int(task_kind)
+	if index < 0 or index >= task_durations.size():
 		push_warning("Task %s is missing task_durations[%d]" % [TaskKind.keys()[task_kind], index])
+		return
+
+	player_controller.start_task(task_durations[index])
