@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player_controller.gd" id="1_vitqv"]
 [ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player_multiplayer_sync.gd" id="2_vitqv"]
 [ext_resource type="PackedScene" uid="uid://ctku8dm2jhbwo" path="res://scenes/players/player_tag.tscn" id="4_kvbc1"]
+[ext_resource type="Script" uid="uid://djw50hf3h3okw" path="res://scripts/gameplay/ability_controller.gd" id="5_hys06"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_28di1"]
 
@@ -36,3 +37,6 @@ shape = SubResource("RectangleShape2D_2dw7i")
 
 [node name="PlayerTag" parent="." unique_id=1777858519 instance=ExtResource("4_kvbc1")]
 position = Vector2(0, -16)
+
+[node name="AbilityController" type="Node2D" parent="." unique_id=251477689]
+script = ExtResource("5_hys06")

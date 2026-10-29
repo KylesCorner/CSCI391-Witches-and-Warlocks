@@ -129,7 +129,7 @@ func _spawn_all_players() -> void:
 		
 		# Start the gameplay loop after all player
 		# spawn RPCs have been issued.
-		MatchManager.start_match()
+		#MatchManager.start_match()
 
 
 #

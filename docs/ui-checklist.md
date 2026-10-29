@@ -10,36 +10,36 @@
 - [x] Test with two clients using different names and classes
 
 ## Phase 2 — Shared in-game HUD
-- [ ] Create scenes/ui/player_hud.tscn using CanvasLayer
-- [ ] Add a larger local-player health bar
-- [ ] Display the local player's class and name
-- [ ] Create a shared bottom-center ability bar with four slots
-- [ ] Add a task/objective panel
-- [ ] Connect HUD updates through player signals rather than per-frame polling
-- [ ] Only instantiate the local player's HUD on each client
+- [x] Create scenes/ui/player_hud.tscn using CanvasLayer
+- [x] Add a larger local-player health bar
+- [x] Display the local player's class and name
+- [x] Create a shared bottom-center ability bar with four slots
+- [x] Add a task/objective panel
+- [x] Connect HUD updates through player signals rather than per-frame polling
+- [x] Only instantiate the local player's HUD on each client
 
 ## Phase 3 — Class-specific UI
-- [ ] Create data definitions for four Warlock spells and four Witch potions
-- [ ] Populate the shared ability bar from the selected class
+- [x] Create data definitions for four Warlock spells and four Witch potions
+- [x] Populate the shared ability bar from the selected class
 - [ ] Assign icons, names, tooltips and descriptions for each ability
 - [ ] Give Warlock and Witch distinct UI colors and styling
-- [ ] Add selectable ability highlighting and keyboard shortcuts
+- [x] Add selectable ability highlighting and keyboard shortcuts
 - [ ] Display locked, available, active and consumed ability states
 - [ ] Add cooldown/cast progress indicators where applicable
 
 ## Phase 4 — Tasks and consumables
-- [ ] Build a four-task checklist that changes by class
+- [x] Build a four-task checklist that changes by class
 - [ ] Show task progress using signals from the gameplay system
 - [ ] Implement the existing task-pair-to-consumable unlock rules
 - [ ] Notify the player when a new spell or potion is awarded
 - [ ] Show the number of consumable charges available
 - [ ] Add contextual interaction prompts for E
-- [ ] Synchronize task completion and earned consumables
+- [x] Synchronize task completion and earned consumables
 
 ## Phase 5 — Gameplay effects and feedback
-- [ ] Show health loss immediately in the HUD and overhead bar
+- [x] Show health loss immediately in the HUD and overhead bar
 - [ ] Add casting wind-up feedback for Fireball
-- [ ] Add placement indicators for trap potions
+- [x] Add placement indicators for trap potions
 - [ ] Indicate whether summoned Husk/Cat is active
 - [ ] Show invisibility duration or expiration status
 - [ ] Display damage, death and respawn feedback
