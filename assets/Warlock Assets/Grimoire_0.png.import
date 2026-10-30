@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://hrjt1m8v0aut"
-path="res://.godot/imported/Grimoire.png-c76fadccfb5449b82579c8aaf8b25737.ctex"
+uid="uid://6o05xj31js41"
+path="res://.godot/imported/Grimoire_0.png-54f46940221397a37f4b86357d9e6fb0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/Warlock Assets/PSXGrimoireFBX/Grimoire.png"
-dest_files=["res://.godot/imported/Grimoire.png-c76fadccfb5449b82579c8aaf8b25737.ctex"]
+source_file="res://assets/Warlock Assets/Grimoire_0.png"
+dest_files=["res://.godot/imported/Grimoire_0.png-54f46940221397a37f4b86357d9e6fb0.ctex"]
 
 [params]
 

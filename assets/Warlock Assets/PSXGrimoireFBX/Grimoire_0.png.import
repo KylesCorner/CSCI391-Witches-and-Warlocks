@@ -2,7 +2,11 @@
 
 importer="texture"
 type="CompressedTexture2D"
+<<<<<<< HEAD
 uid="uid://dafro5wr74nl2"
+=======
+uid="uid://bmq62uuf0ovq2"
+>>>>>>> ingrid_stuff
 path.s3tc="res://.godot/imported/Grimoire_0.png-88b7f31a5e2554c188659d5ccb550e41.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
