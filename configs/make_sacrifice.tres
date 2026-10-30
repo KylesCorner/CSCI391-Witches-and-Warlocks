@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://bdsyx5lyiqx2"]
+
+[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/task_config.gd" id="1_ms"]
+[ext_resource type="Texture2D" uid="uid://ctdeg31nr3f4d" path="res://assets/brown.png" id="2_ms"]
+
+[resource]
+script = ExtResource("1_ms")
+name = "Make Sacrifice"
+sprite = ExtResource("2_ms")
+scale = 1.3
+sprite_region = Rect2(2, 95, 25, 25)
+metadata/_custom_type_script = "uid://dnlw0lm3wloee"

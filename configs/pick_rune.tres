@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://qypk7yfm2qq"]
+
+[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/task_config.gd" id="1_ay82c"]
+[ext_resource type="Texture2D" uid="uid://becuktc4t22uk" path="res://assets/rune4.png" id="2_2gw6d"]
+
+[resource]
+script = ExtResource("1_ay82c")
+name = "Pick a Rune"
+sprite = ExtResource("2_2gw6d")
+scale = 0.02
+metadata/_custom_type_script = "uid://dnlw0lm3wloee"
