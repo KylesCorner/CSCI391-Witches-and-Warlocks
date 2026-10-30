@@ -2,14 +2,11 @@
 
 [ext_resource type="Script" uid="uid://fcwoniwvrgxd" path="res://scripts/task.gd" id="1_kolu2"]
 [ext_resource type="Resource" uid="uid://im5s1kvl72um" path="res://configs/collect_poison_berries.tres" id="2_3qeyo"]
-[ext_resource type="Texture2D" uid="uid://cvyyu61u0kn0p" path="res://assets/Warlock Assets/Grimoire.png" id="3_3qeyo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dxwoq"]
 radius = 15.0
 
 [node name="Task" type="Area2D" unique_id=210130834 groups=["interactable"]]
-collision_mask = 0
-monitoring = false
 script = ExtResource("1_kolu2")
 config = ExtResource("2_3qeyo")
 
@@ -18,6 +15,5 @@ shape = SubResource("CircleShape2D_dxwoq")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=292637630]
 scale = Vector2(0.205, 0.205)
-texture = ExtResource("3_3qeyo")
 region_enabled = true
 region_rect = Rect2(0, 0, 100, 125)
