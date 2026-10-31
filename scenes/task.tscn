@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://d2f5o5ruyxked"]
+
+[ext_resource type="Script" uid="uid://fcwoniwvrgxd" path="res://scripts/task.gd" id="1_kolu2"]
+[ext_resource type="Resource" uid="uid://im5s1kvl72um" path="res://configs/collect_poison_berries.tres" id="2_3qeyo"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dxwoq"]
+radius = 15.0
+
+[node name="Task" type="Area2D" unique_id=210130834 groups=["interactable"]]
+script = ExtResource("1_kolu2")
+config = ExtResource("2_3qeyo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=955704071]
+shape = SubResource("CircleShape2D_dxwoq")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=292637630]
+scale = Vector2(0.205, 0.205)
+region_enabled = true
+region_rect = Rect2(0, 0, 100, 125)

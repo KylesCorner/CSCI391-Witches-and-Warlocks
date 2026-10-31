@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://0rtoc4y08dny"]
+
+[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/task_config.gd" id="1_1bglo"]
+[ext_resource type="Texture2D" uid="uid://cvyyu61u0kn0p" path="res://assets/Warlock Assets/Grimoire.png" id="2_pgcxe"]
+
+[resource]
+script = ExtResource("1_1bglo")
+name = "Contact"
+sprite = ExtResource("2_pgcxe")
+scale = 0.2
+sprite_region = Rect2(0, 0, 100, 125)
+metadata/_custom_type_script = "uid://dnlw0lm3wloee"
