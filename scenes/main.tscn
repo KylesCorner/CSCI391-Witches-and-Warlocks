@@ -23,16 +23,16 @@ tile_set = ExtResource("2_sugp2")
 [node name="SpawnPoints" type="Node2D" parent="." unique_id=2080284948]
 
 [node name="Spawn1" type="Marker2D" parent="SpawnPoints" unique_id=1778203156]
-position = Vector2(27, 16)
+position = Vector2(172, 90)
 
 [node name="Spawn2" type="Marker2D" parent="SpawnPoints" unique_id=28776618]
-position = Vector2(-19, 15)
+position = Vector2(-98, 94)
 
 [node name="Spawn3" type="Marker2D" parent="SpawnPoints" unique_id=1636646824]
-position = Vector2(21, -20)
+position = Vector2(176, -176)
 
 [node name="Spawn4" type="Marker2D" parent="SpawnPoints" unique_id=1360129082]
-position = Vector2(-16, -19)
+position = Vector2(-87, -160)
 
 [node name="TaskCollectBerries" parent="." unique_id=210130834 instance=ExtResource("2_0wfyh")]
 position = Vector2(-711, -143)
