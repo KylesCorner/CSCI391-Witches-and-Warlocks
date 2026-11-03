@@ -2,7 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dafro5wr74nl2"
+
+uid="uid://dabclfv322hbs"
 path.s3tc="res://.godot/imported/Grimoire_0.png-88b7f31a5e2554c188659d5ccb550e41.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -11,6 +12,7 @@ metadata={
 generator_parameters={
 "md5": "b9efec20d7bd40cbed0333d7e3ab9126"
 }
+
 
 [deps]
 

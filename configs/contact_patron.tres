@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://c6qgmgey1dm7v"]
+
+[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/task_config.gd" id="1_72mo2"]
+[ext_resource type="Texture2D" uid="uid://bbu2t3sojt0nt" path="res://assets/telephone.png" id="2_72mo2"]
+
+[resource]
+script = ExtResource("1_72mo2")
+name = "Contact Patron"
+sprite = ExtResource("2_72mo2")
+scale = 0.02
+metadata/_custom_type_script = "uid://dnlw0lm3wloee"

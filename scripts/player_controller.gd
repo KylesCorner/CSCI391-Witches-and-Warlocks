@@ -22,6 +22,8 @@ signal health_changed(current: int, maximum: int)
 
 @export var speed: float = 100.0
 
+@export var task_duration: float = 2.0
+
 
 #
 # Name received from the lobby when this
@@ -92,12 +94,16 @@ enum PlayerState {
 	WALKING,
 	ATTACKING,
 	HURT,
-	DEAD
+	DEAD,
+	IN_TASK
 }
 
 
 var state: PlayerState = \
 	PlayerState.IDLE
+
+
+var _task_timer: SceneTreeTimer = null
 
 
 #
@@ -230,6 +236,11 @@ func _physics_process(
 		PlayerState.DEAD:
 
 			_process_dead()
+
+
+		PlayerState.IN_TASK:
+
+			_process_in_task()
 
 
 	if Input.is_action_just_pressed(
@@ -382,6 +393,57 @@ func _process_dead() -> void:
 
 #
 # ============================================================
+# IN TASK
+# ============================================================
+#
+
+func start_task(
+	duration: float = -1.0
+) -> void:
+
+	if duration < 0.0:
+
+		duration = task_duration
+
+
+	change_state(
+		PlayerState.IN_TASK
+	)
+
+
+	_task_timer = \
+		get_tree().create_timer(
+			duration
+		)
+
+
+	_task_timer.timeout.connect(
+		_on_task_finished,
+		CONNECT_ONE_SHOT
+	)
+
+
+func _process_in_task() -> void:
+
+	velocity = Vector2.ZERO
+
+
+func _on_task_finished() -> void:
+
+	_task_timer = null
+
+
+	if state != PlayerState.IN_TASK:
+		return
+
+
+	change_state(
+		PlayerState.IDLE
+	)
+
+
+#
+# ============================================================
 # STATE MACHINE
 # ============================================================
 #
@@ -512,6 +574,11 @@ func _update_current_animation() -> void:
 			play_state_animation(
 				"Dead"
 			)
+
+
+		PlayerState.IN_TASK:
+
+			play_idle_animation()
 
 
 #

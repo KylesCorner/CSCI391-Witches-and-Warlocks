@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://8ehaysnie2wd"]
+
+[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/task_config.gd" id="1_sc"]
+[ext_resource type="Texture2D" uid="uid://drnnw0t3ditkx" path="res://assets/Cauldron.png" id="2_sc"]
+
+[resource]
+script = ExtResource("1_sc")
+name = "Stir Cauldron"
+sprite = ExtResource("2_sc")
+scale = 0.05
+metadata/_custom_type_script = "uid://dnlw0lm3wloee"

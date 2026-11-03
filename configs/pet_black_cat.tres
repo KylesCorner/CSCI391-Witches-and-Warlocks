@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://ss682v7qkyxa"]
+
+[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/task_config.gd" id="1_pbc"]
+[ext_resource type="Texture2D" uid="uid://bvnji01nwihyb" path="res://assets/Black-Idle.png" id="2_pbc"]
+
+[resource]
+script = ExtResource("1_pbc")
+name = "Pet the Black Cat"
+sprite = ExtResource("2_pbc")
+sprite_region = Rect2(0, 0, 48, 48)
+metadata/_custom_type_script = "uid://dnlw0lm3wloee"
