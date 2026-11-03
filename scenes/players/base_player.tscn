@@ -23,6 +23,7 @@ position = Vector2(0, 6)
 shape = SubResource("CircleShape2D_28di1")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=220478607]
+zoom = Vector2(1.5, 1.5)
 
 [node name="MultiplayerSync" type="Node2D" parent="." unique_id=912018745]
 script = ExtResource("2_vitqv")
