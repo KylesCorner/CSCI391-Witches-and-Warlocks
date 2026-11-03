@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dkbjqh4ji34ac"]
+
+[ext_resource type="Script" uid="uid://jhllp8gjbf0c" path="res://scripts/gameplay/task_station.gd" id="1_6cv36"]
+[ext_resource type="Texture2D" uid="uid://dsu16ctio14e2" path="res://assets/Warlock Assets/PSXGrimoireFBX/Grimoire.png" id="1_13jha"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_28di1"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6cv36"]
+atlas = ExtResource("1_13jha")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_28di1"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Done",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6cv36")
+}],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Working",
+"speed": 5.0
+}]
+
+[node name="TaskStation" type="Area2D" unique_id=259083263 groups=["interactable"]]
+z_index = -50
+script = ExtResource("1_6cv36")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=254776749]
+shape = SubResource("RectangleShape2D_28di1")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2091507886]
+position = Vector2(-1.1920929e-07, 2.9802322e-08)
+scale = Vector2(0.3125, 0.3125)
+sprite_frames = SubResource("SpriteFrames_28di1")
+animation = &"Done"

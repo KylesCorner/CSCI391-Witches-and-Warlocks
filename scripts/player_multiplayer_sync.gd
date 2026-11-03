@@ -1,265 +1,225 @@
+
 class_name PlayerMultiplayerSync
 extends Node
 
-
-#
 # ============================================================
-# SETTINGS
+# CONFIGURATION
 # ============================================================
-#
 
 @export var send_rate: float = 20.0
+@export var interpolation_speed: float = 12.0
+@export var max_prediction_time: float = 0.12
+@export var snap_distance: float = 300.0
 
-@export var interpolation_speed: float = 15.0
-
-@export var snap_distance: float = 150.0
+@onready var player: PlayerController = get_parent() as PlayerController
 
 
-#
 # ============================================================
-# PLAYER
+# STATE
 # ============================================================
-#
-
-@onready var player: PlayerController = \
-	get_parent() as PlayerController
-
-
-#
-# ============================================================
-# REMOTE STATE
-# ============================================================
-#
-
-var target_position: Vector2 = \
-	Vector2.ZERO
-
-
-var target_velocity: Vector2 = \
-	Vector2.ZERO
-
-
-var has_received_position: bool = false
-
-
-#
-# ============================================================
-# SEND STATE
-# ============================================================
-#
 
 var send_timer: float = 0.0
 
+var target_position: Vector2 = Vector2.ZERO
+var target_velocity: Vector2 = Vector2.ZERO
+var time_since_update: float = 0.0
+var has_received_position: bool = false
 
 var last_state: int = -1
-
-
 var last_facing_direction: int = -1
 
 
-#
 # ============================================================
 # READY
 # ============================================================
-#
 
 func _ready() -> void:
-
 	if player == null:
-
-		push_error(
-			"PlayerMultiplayerSync must be a child of PlayerController."
-		)
-
-		set_physics_process(
-			false
-		)
-
+		push_error("MultiplayerSync requires PlayerController.")
+		set_physics_process(false)
 		return
 
-
-	target_position = \
-		player.global_position
-
-
-	last_state = \
-		int(player.state)
+	target_position = player.global_position
+	last_state = int(player.state)
+	last_facing_direction = int(player.facing_direction)
 
 
-	last_facing_direction = \
-		int(player.facing_direction)
-
-
-#
 # ============================================================
 # PHYSICS
 # ============================================================
-#
 
-func _physics_process(
-	delta: float
-) -> void:
+func _physics_process(delta: float) -> void:
+
+	# Server accepts movement reports through RPCs.
+	if multiplayer.is_server():
+		return
 
 	if player.is_multiplayer_authority():
-
-		_process_authority(
-			delta
-		)
-
+		_send_local_movement(delta)
 	else:
-
-		_process_remote_player(
-			delta
-		)
+		_interpolate_remote_player(delta)
 
 
-#
 # ============================================================
 # LOCAL PLAYER
 # ============================================================
-#
 
-func _process_authority(
-	delta: float
-) -> void:
+func _send_local_movement(delta: float) -> void:
 
 	send_timer += delta
 
+	var interval: float = 1.0 / maxf(send_rate, 1.0)
 
-	if send_timer >= \
-			1.0 / send_rate:
+	if send_timer >= interval:
+		send_timer = fmod(send_timer, interval)
 
-		send_timer = 0.0
-
-
-		sync_movement.rpc(
+		submit_movement.rpc_id(
+			1,
 			player.global_position,
 			player.velocity
 		)
 
+	var current_state: int = int(player.state)
+	var current_direction: int = int(player.facing_direction)
 
-	var current_state := \
-		int(player.state)
+	if current_state != last_state \
+	or current_direction != last_facing_direction:
+
+		last_state = current_state
+		last_facing_direction = current_direction
+
+		submit_state.rpc_id(
+			1,
+			current_state,
+			current_direction
+		)
 
 
-	var current_direction := \
-		int(player.facing_direction)
+# ============================================================
+# SERVER RECEIVES MOVEMENT
+# ============================================================
 
+@rpc("any_peer", "call_remote", "unreliable_ordered", 0)
+func submit_movement(
+	position: Vector2,
+	velocity: Vector2
+) -> void:
 
-	if current_state == last_state \
-	and current_direction == \
-			last_facing_direction:
-
+	if not multiplayer.is_server():
 		return
 
+	if multiplayer.get_remote_sender_id() != \
+	player.get_multiplayer_authority():
+		return
 
-	last_state = \
-		current_state
+	if not position.is_finite() or not velocity.is_finite():
+		return
+
+	# Keep server copy updated for projectile hit detection.
+	player.global_position = position
+	player.velocity = velocity
+
+	# Forward to all connected clients.
+	receive_movement.rpc(position, velocity)
 
 
-	last_facing_direction = \
-		current_direction
-
-
-	sync_state.rpc(
-		current_state,
-		current_direction
-	)
-
-
-#
 # ============================================================
-# REMOTE PLAYER
+# CLIENT RECEIVES MOVEMENT
 # ============================================================
-#
 
-func _process_remote_player(
-	delta: float
+@rpc("any_peer", "call_remote", "unreliable_ordered", 0)
+func receive_movement(
+	position: Vector2,
+	velocity: Vector2
 ) -> void:
+
+	if multiplayer.get_remote_sender_id() != 1:
+		return
+
+	# Never overwrite the local player's movement.
+	if player.is_multiplayer_authority():
+		return
+
+	target_position = position
+	target_velocity = velocity
+	time_since_update = 0.0
+	has_received_position = true
+
+
+# ============================================================
+# SMOOTH REMOTE MOVEMENT
+# ============================================================
+
+func _interpolate_remote_player(delta: float) -> void:
 
 	if not has_received_position:
 		return
 
+	time_since_update += delta
 
-	var distance := \
-		player.global_position.distance_to(
-			target_position
-		)
+	# Predict where the remote player should be
+	# based on their last known velocity.
+	var prediction_time: float = minf(
+		time_since_update + 0.03,
+		max_prediction_time
+	)
 
+	var predicted_position: Vector2 = (
+		target_position
+		+ target_velocity * prediction_time
+	)
 
-	#
-	# If synchronization is way off,
-	# snap instead of interpolating.
-	#
+	var distance: float = player.global_position.distance_to(
+		predicted_position
+	)
+
+	# Only snap for very large corrections.
 	if distance > snap_distance:
-
-		player.global_position = \
-			target_position
-
+		player.global_position = predicted_position
 		return
 
-
-	player.global_position = \
-		player.global_position.lerp(
-			target_position,
-			clamp(
-				interpolation_speed * delta,
-				0.0,
-				1.0
-			)
-		)
-
-
-#
-# ============================================================
-# MOVEMENT RPC
-# ============================================================
-#
-
-@rpc(
-	"authority",
-	"call_remote",
-	"unreliable_ordered",
-	0
-)
-func sync_movement(
-	new_position: Vector2,
-	new_velocity: Vector2
-) -> void:
-
-	target_position = \
-		new_position
-
-
-	target_velocity = \
-		new_velocity
-
-
-	player.velocity = \
-		new_velocity
-
-
-	has_received_position = true
-
-
-#
-# ============================================================
-# STATE RPC
-# ============================================================
-#
-
-@rpc(
-	"authority",
-	"call_remote",
-	"reliable",
-	1
-)
-func sync_state(
-	new_state: int,
-	new_facing_direction: int
-) -> void:
-
-	player.apply_network_state(
-		new_state,
-		new_facing_direction
+	# Frame-rate-independent exponential smoothing.
+	var weight: float = 1.0 - exp(
+		-interpolation_speed * delta
 	)
+
+	player.global_position = player.global_position.lerp(
+		predicted_position,
+		weight
+	)
+
+
+# ============================================================
+# PLAYER ANIMATION STATE
+# ============================================================
+
+@rpc("any_peer", "call_remote", "reliable", 1)
+func submit_state(
+	new_state: int,
+	new_direction: int
+) -> void:
+
+	if not multiplayer.is_server():
+		return
+
+	if multiplayer.get_remote_sender_id() != \
+	player.get_multiplayer_authority():
+		return
+
+	player.apply_network_state(new_state, new_direction)
+	receive_state.rpc(new_state, new_direction)
+
+
+@rpc("any_peer", "call_remote", "reliable", 1)
+func receive_state(
+	new_state: int,
+	new_direction: int
+) -> void:
+
+	if multiplayer.get_remote_sender_id() != 1:
+		return
+
+	if player.is_multiplayer_authority():
+		return
+
+	player.apply_network_state(new_state, new_direction)
