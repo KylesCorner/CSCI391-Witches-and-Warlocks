@@ -17,3 +17,5 @@ shape = SubResource("CircleShape2D_dxwoq")
 scale = Vector2(0.205, 0.205)
 region_enabled = true
 region_rect = Rect2(0, 0, 100, 125)
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1132321449]
