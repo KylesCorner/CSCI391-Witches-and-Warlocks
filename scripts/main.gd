@@ -35,15 +35,26 @@ const PLAYER_HUD_SCENE: PackedScene = \
 # ============================================================
 #
 
+# Game world lives in a SubViewport so CanvasModulate / lights
+# never affect HUD or future UI (CanvasLayers on Main).
+@onready var world_view: SubViewportContainer = \
+	$WorldView
+
+@onready var world_viewport: SubViewport = \
+	$WorldView/WorldViewport
+
+@onready var world: Node2D = \
+	$WorldView/WorldViewport/World
+
 @onready var players_node: Node2D = \
-	$Players
+	$WorldView/WorldViewport/World/Players
 
 
 @onready var spawn_points: Array[Marker2D] = [
-	$SpawnPoints/Spawn1,
-	$SpawnPoints/Spawn2,
-	$SpawnPoints/Spawn3,
-	$SpawnPoints/Spawn4
+	$WorldView/WorldViewport/World/SpawnPoints/Spawn1,
+	$WorldView/WorldViewport/World/SpawnPoints/Spawn2,
+	$WorldView/WorldViewport/World/SpawnPoints/Spawn3,
+	$WorldView/WorldViewport/World/SpawnPoints/Spawn4
 ]
 
 
@@ -54,6 +65,9 @@ const PLAYER_HUD_SCENE: PackedScene = \
 #
 
 func _ready() -> void:
+	_fit_world_viewport()
+	if not get_viewport().size_changed.is_connected(_fit_world_viewport):
+		get_viewport().size_changed.connect(_fit_world_viewport)
 
 	#
 	# Only the dedicated server handles
@@ -71,6 +85,27 @@ func _ready() -> void:
 	await get_tree().process_frame
 
 	NetworkManager.report_game_loaded()
+
+
+#
+# ============================================================
+# WORLD VIEWPORT
+# ============================================================
+#
+
+func _fit_world_viewport() -> void:
+	var vp_size: Vector2i = get_viewport().get_visible_rect().size
+	if vp_size.x < 1 or vp_size.y < 1:
+		return
+
+	world_viewport.size = vp_size
+	world_view.position = Vector2.ZERO
+	world_view.size = Vector2(vp_size)
+
+
+## Parent for world-space gameplay nodes (projectiles, FX, etc.).
+func get_world_root() -> Node2D:
+	return world
 
 
 #
