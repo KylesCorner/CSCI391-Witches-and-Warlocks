@@ -18,6 +18,7 @@ enum TaskKind {
 @export var config: TaskConfig
 
 @onready var sprite: Sprite2D = $Sprite2D
+@onready var audio_player: AudioStreamPlayer2D = $AudioStreamPlayer2D
 
 var _outline_material: ShaderMaterial
 var _local_overlap_count: int = 0
@@ -40,6 +41,8 @@ func _apply_config() -> void:
 		sprite.region_rect = config.sprite_region
 	else:
 		sprite.region_enabled = false
+
+	audio_player.stream = config.interact_sfx
 
 func _setup_outline_detection() -> void:
 	# Outline is purely visual/local — never share the material instance.
@@ -90,3 +93,4 @@ func interact(player: Node) -> void:
 		return
 
 	player_controller.start_task(config.duration)
+	audio_player.play()
