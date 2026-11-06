@@ -10,7 +10,7 @@ script = ExtResource("1_61gth")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1921751522]
 sprite_frames = ExtResource("2_61gth")
-animation = &"Witch Explode"
+animation = &"Warlock AOE"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=142847921]
 shape = SubResource("CapsuleShape2D_28di1")

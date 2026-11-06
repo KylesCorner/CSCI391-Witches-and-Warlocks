@@ -1,10 +1,16 @@
 [gd_resource type="SpriteFrames" format=3 uid="uid://cw524r4el17h3"]
 
+[ext_resource type="Texture2D" uid="uid://cphqpvjq0ge1n" path="res://assets/Witch Assets/MiscItems.png" id="1_71oob"]
 [ext_resource type="Texture2D" uid="uid://dt54vr5h0rcxw" path="res://assets/spell_assets/smoke/FX001_01.png" id="1_djhe2"]
 [ext_resource type="Texture2D" uid="uid://dp0c1ngm1q00q" path="res://assets/spell_assets/smoke/FX001_02.png" id="2_y4o6a"]
 [ext_resource type="Texture2D" uid="uid://bsalryhf1p0fw" path="res://assets/spell_assets/smoke/FX001_03.png" id="3_71oob"]
 [ext_resource type="Texture2D" uid="uid://bfk2y3cya6xdv" path="res://assets/spell_assets/smoke/FX001_04.png" id="4_uwwov"]
 [ext_resource type="Texture2D" uid="uid://cv1yg0xrktfrt" path="res://assets/spell_assets/smoke/FX001_05.png" id="5_4x3ci"]
+[ext_resource type="Texture2D" uid="uid://bs7muwkp764d5" path="res://assets/Witch Assets/potions.png" id="6_y4o6a"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uwwov"]
+atlas = ExtResource("1_71oob")
+region = Rect2(160, 160, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cgokn"]
 atlas = ExtResource("1_djhe2")
@@ -26,9 +32,24 @@ region = Rect2(0, 0, 32, 32)
 atlas = ExtResource("5_4x3ci")
 region = Rect2(0, 0, 32, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_4x3ci"]
+atlas = ExtResource("1_71oob")
+region = Rect2(128, 160, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_71oob"]
+atlas = ExtResource("6_y4o6a")
+region = Rect2(0, 0, 19, 43)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mk0bh"]
+atlas = ExtResource("1_71oob")
+region = Rect2(64, 160, 32, 32)
+
 [resource]
 animations = [{
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uwwov")
+}],
 "loop": 1,
 "name": &"Warlock AOE",
 "speed": 5.0
@@ -53,13 +74,19 @@ animations = [{
 "name": &"Warlock Explode",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4x3ci")
+}],
 "loop": 1,
 "name": &"Warlock Long",
 "speed": 5.0
 }, {
-"frames": [],
-"loop": 0,
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_71oob")
+}],
+"loop": 1,
 "name": &"Witch AOE",
 "speed": 5.0
 }, {
@@ -83,7 +110,10 @@ animations = [{
 "name": &"Witch Explode",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mk0bh")
+}],
 "loop": 1,
 "name": &"Witch Long",
 "speed": 5.0

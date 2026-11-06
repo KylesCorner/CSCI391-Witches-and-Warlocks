@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://r8mrfcjm4jhk"]
 
 [ext_resource type="SpriteFrames" uid="uid://080rtq7hyanu" path="res://assets/animations/blue_hair_woman.tres" id="1_ggyfd"]
-[ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player_controller.gd" id="1_vitqv"]
-[ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player_multiplayer_sync.gd" id="2_vitqv"]
+[ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player/player_controller.gd" id="1_vitqv"]
+[ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player/player_multiplayer_sync.gd" id="2_vitqv"]
 [ext_resource type="PackedScene" uid="uid://ctku8dm2jhbwo" path="res://scenes/players/player_tag.tscn" id="4_kvbc1"]
 [ext_resource type="Script" uid="uid://djw50hf3h3okw" path="res://scripts/gameplay/ability_controller.gd" id="5_hys06"]
 [ext_resource type="Texture2D" uid="uid://b3vylm80dqdmk" path="res://assets/light.png" id="6_light"]

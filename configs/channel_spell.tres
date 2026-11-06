@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://0rtoc4y08dny"]
 
-[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/task_config.gd" id="1_1bglo"]
+[ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/gameplay/task_config.gd" id="1_1bglo"]
 [ext_resource type="Texture2D" uid="uid://cvyyu61u0kn0p" path="res://assets/Warlock Assets/Grimoire.png" id="2_pgcxe"]
 
 [resource]

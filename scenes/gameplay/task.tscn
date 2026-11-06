@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d2f5o5ruyxked"]
 
-[ext_resource type="Script" uid="uid://fcwoniwvrgxd" path="res://scripts/task.gd" id="1_kolu2"]
+[ext_resource type="Script" uid="uid://fcwoniwvrgxd" path="res://scripts/gameplay/task.gd" id="1_kolu2"]
 [ext_resource type="Resource" uid="uid://im5s1kvl72um" path="res://configs/collect_poison_berries.tres" id="2_3qeyo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dxwoq"]

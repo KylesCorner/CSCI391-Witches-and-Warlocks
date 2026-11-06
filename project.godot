@@ -16,8 +16,8 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
 
-NetworkManager="*uid://djyh4nl3g23rv"
-MatchManager="*uid://clhqt6x0bk2ar"
+NetworkManager="*res://scripts/networking/network_manager.gd"
+MatchManager="*res://scripts/networking/match_manager.gd"
 
 [display]
 

@@ -7,11 +7,11 @@ tags: []
 
 **Requirements:**
 - [ ] controllable character
-    - [ ] smooth feeling movement
-    - [ ] movement modifiers (maybe part of the terrain)
+	- [ ] smooth feeling movement
+	- [ ] movement modifiers (maybe part of the terrain)
 - [ ] menus
-    - [ ] main menu
-    - [ ] server selection interface
+	- [ ] main menu
+	- [ ] server selection interface
 - [ ] credits
 - [ ] audio effects and sound track
 - [ ] playable with at least 2 players
@@ -21,13 +21,13 @@ tags: []
 
 **Our features:**
 - [ ] task system
-    - [ ] task assets
-    - [ ] task-player interractions
-    - [ ] task-item interractions
+	- [ ] task assets
+	- [ ] task-player interractions
+	- [ ] task-item interractions
 - [ ] items system
-    - [ ] item assets
-    - [ ] (again) task-item interractions
-    - [ ] item-player interractions
+	- [ ] item assets
+	- [ ] (again) task-item interractions
+	- [ ] item-player interractions
 - [ ] global timer
-    - [ ] timer design
-    - [ ] timer-player-task interractions
+	- [ ] timer design
+	- [ ] timer-player-task interractions

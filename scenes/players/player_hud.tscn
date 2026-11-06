@@ -1,14 +1,47 @@
-[gd_scene format=3 uid="uid://b5mmp8l5sj0t4"]
+[gd_scene format=3 uid="uid://cxqgd8cgn87tl"]
 
-[ext_resource type="Script" uid="uid://claq1wu8ak705" path="res://scripts/player_hud.gd" id="1_5ia86"]
+[ext_resource type="Script" uid="uid://clyfmelbnws5j" path="res://scripts/player/player_hud.gd" id="1_hud"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7g1y0"]
-bg_color = Color(1, 0, 0, 1)
+[sub_resource type="StyleBoxFlat" id="HudPanel"]
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+bg_color = Color(0.09, 0.08, 0.16, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.48, 0.38, 0.68, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
-[node name="PlayerHud" type="CanvasLayer" unique_id=991395983]
-script = ExtResource("1_5ia86")
+[sub_resource type="StyleBoxFlat" id="HealthFill"]
+bg_color = Color(0.8, 0.18, 0.28, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
-[node name="HUDRoot" type="Control" parent="." unique_id=620186691]
+[sub_resource type="StyleBoxFlat" id="AbilityButton"]
+bg_color = Color(0.17, 0.16, 0.28, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.4, 0.65, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="PlayerHud" type="CanvasLayer" unique_id=1836608241]
+layer = 5
+script = ExtResource("1_hud")
+
+[node name="HUDRoot" type="Control" parent="." unique_id=1408391385]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -17,106 +50,147 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="HUDRoot" unique_id=1827470463]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+[node name="MarginContainer" type="MarginContainer" parent="HUDRoot" unique_id=680361413]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 18
 
-[node name="Layout" type="VBoxContainer" parent="HUDRoot/MarginContainer" unique_id=307442702]
+[node name="Layout" type="VBoxContainer" parent="HUDRoot/MarginContainer" unique_id=853479499]
 layout_mode = 2
+mouse_filter = 2
 
-[node name="TopRow" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout" unique_id=1794618986]
+[node name="TopRow" type="HBoxContainer" parent="HUDRoot/MarginContainer/Layout" unique_id=1268775342]
 layout_mode = 2
+mouse_filter = 2
 
-[node name="PlayerPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=1094220449]
+[node name="PlayerPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=1470035423]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("HudPanel")
 
-[node name="InfoVBox" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel" unique_id=252419274]
+[node name="InfoVBox" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel" unique_id=380758951]
 layout_mode = 2
+mouse_filter = 2
 
-[node name="PlayerName" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=27743338]
+[node name="PlayerName" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=1790763872]
 layout_mode = 2
-text = "PLAYER NAME"
+theme_override_font_sizes/font_size = 18
+text = "PLAYER"
 
-[node name="ClassName" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=295429892]
+[node name="ClassName" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=349800114]
 layout_mode = 2
-text = "CLASS NAME"
+theme_override_font_sizes/font_size = 13
+text = "CLASS"
 
-[node name="HealthBar" type="ProgressBar" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=386025234]
+[node name="HealthBar" type="ProgressBar" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=2058098318]
+custom_minimum_size = Vector2(150, 16)
 layout_mode = 2
-theme_override_styles/fill = SubResource("StyleBoxFlat_7g1y0")
+mouse_filter = 2
+theme_override_styles/fill = SubResource("HealthFill")
 show_percentage = false
 
-[node name="HealthText" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=1024664354]
+[node name="HealthText" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/PlayerPanel/InfoVBox" unique_id=696271234]
 layout_mode = 2
-text = "100/100"
+text = "100 / 100 HP"
 
-[node name="HorizontalSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=608662025]
+[node name="HorizontalSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=150686329]
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="TaskPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=1873647753]
+[node name="TaskPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/TopRow" unique_id=1001196288]
+custom_minimum_size = Vector2(244, 0)
 layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("HudPanel")
 
-[node name="TasksVBox" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel" unique_id=1542328226]
+[node name="TasksVBox" type="VBoxContainer" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel" unique_id=1918214617]
 layout_mode = 2
+mouse_filter = 2
 
-[node name="TaskTitle" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=918091252]
+[node name="TaskTitle" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=1122457096]
 layout_mode = 2
-text = "Tasks"
+theme_override_font_sizes/font_size = 17
+text = "OBJECTIVES"
 
-[node name="Task1" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=6754907]
+[node name="Task1" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=1370755879]
 layout_mode = 2
-text = "TASK 1"
+text = "[ ] Task 1"
 
-[node name="Task2" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=243269071]
+[node name="Task2" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=1713967315]
 layout_mode = 2
-text = "TASK 2"
+text = "[ ] Task 2"
 
-[node name="Task3" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=1477459569]
+[node name="Task3" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=2144114515]
 layout_mode = 2
-text = "TASK 3"
+text = "[ ] Task 3"
 
-[node name="Task4" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=159939455]
+[node name="Task4" type="Label" parent="HUDRoot/MarginContainer/Layout/TopRow/TaskPanel/TasksVBox" unique_id=1103255831]
 layout_mode = 2
-text = "TASK 4"
+text = "[ ] Task 4"
 
-[node name="VerticalSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout" unique_id=966473589]
+[node name="VerticalSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout" unique_id=2000031530]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 3
+mouse_filter = 2
 
-[node name="BottomRow" type="HBoxContainer" parent="HUDRoot/MarginContainer/Layout" unique_id=1500803056]
+[node name="BottomRow" type="HBoxContainer" parent="HUDRoot/MarginContainer/Layout" unique_id=687961675]
 layout_mode = 2
+mouse_filter = 2
 
-[node name="LeftSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=1212118618]
+[node name="LeftSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=1632675423]
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="AbilityPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=710468199]
+[node name="AbilityPanel" type="PanelContainer" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=177428446]
 layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("HudPanel")
 
-[node name="AbilitySlots" type="HBoxContainer" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel" unique_id=110914623]
+[node name="AbilitySlots" type="HBoxContainer" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel" unique_id=1029178372]
 layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
 
-[node name="Slot1" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=946846410]
+[node name="Slot1" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=393270854]
+custom_minimum_size = Vector2(137, 54)
 layout_mode = 2
-text = "Ability 1"
+focus_mode = 0
+theme_override_styles/normal = SubResource("AbilityButton")
+text = "1: Ability"
 
-[node name="Slot2" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=408560010]
+[node name="Slot2" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=1615005370]
+custom_minimum_size = Vector2(137, 54)
 layout_mode = 2
-text = "Ability 2"
+focus_mode = 0
+theme_override_styles/normal = SubResource("AbilityButton")
+text = "2: Ability"
 
-[node name="Slot3" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=1929350594]
+[node name="Slot3" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=1929993192]
+custom_minimum_size = Vector2(137, 54)
 layout_mode = 2
-text = "Ability 3"
+focus_mode = 0
+theme_override_styles/normal = SubResource("AbilityButton")
+text = "3: Ability"
 
-[node name="Slot4" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=1093913867]
+[node name="Slot4" type="Button" parent="HUDRoot/MarginContainer/Layout/BottomRow/AbilityPanel/AbilitySlots" unique_id=751248691]
+custom_minimum_size = Vector2(137, 54)
 layout_mode = 2
-text = "Ability 4"
+focus_mode = 0
+theme_override_styles/normal = SubResource("AbilityButton")
+text = "4: Ability"
 
-[node name="RightSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=1317148492]
+[node name="RightSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout/BottomRow" unique_id=4368577]
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
