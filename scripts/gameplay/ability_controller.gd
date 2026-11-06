@@ -224,6 +224,18 @@ func spawn_projectile_fx(
 	_spawn_local_projectile(projectile_id, slot, origin, direction, flight_range, false)
 
 
+func _get_world_root() -> Node:
+	# Prefer the SubViewport world so projectiles share lights/physics/FOW.
+	var scene := get_tree().current_scene
+	if scene != null and scene.has_method("get_world_root"):
+		var world_root: Node = scene.call("get_world_root")
+		if world_root != null:
+			return world_root
+	if scene != null:
+		return scene
+	return get_tree().root
+
+
 func _spawn_local_projectile(
 	projectile_id: int,
 	slot: int,
@@ -240,7 +252,7 @@ func _spawn_local_projectile(
 		push_error("SpellProjectile scene root must use spell_projectile.gd.")
 		return
 
-	get_tree().current_scene.add_child(projectile)
+	_get_world_root().add_child(projectile)
 	var projectile_config: Dictionary = ABILITIES[slot].duplicate()
 	projectile_config["range"] = flight_range
 	projectile.configure(origin, direction, projectile_config, player, is_server)

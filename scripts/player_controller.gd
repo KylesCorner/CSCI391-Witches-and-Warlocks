@@ -50,6 +50,10 @@ var display_name: String = "Player"
 	$Camera2D
 
 
+@onready var point_light: PointLight2D = \
+	$PointLight2D
+
+
 @onready var name_label: Label = \
 	$PlayerTag/NameLabel
 	
@@ -141,8 +145,8 @@ func _ready() -> void:
 
 
 	#
-	# Only the locally controlled player
-	# should have an active camera.
+	# Only the locally controlled player should have an active
+	# camera and visibility light (FOW is local to each client).
 	#
 	if is_multiplayer_authority():
 
@@ -150,9 +154,13 @@ func _ready() -> void:
 
 		camera.make_current()
 
+		point_light.enabled = true
+
 	else:
 
 		camera.enabled = false
+
+		point_light.enabled = false
 
 
 	# Only show overhead name and health for other players.
