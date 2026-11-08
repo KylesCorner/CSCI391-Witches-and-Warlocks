@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://ch60a7yogyx47"]
+
+[ext_resource type="Script" uid="uid://46g48n0s1pjx" path="res://scripts/ui/chat_overlay.gd" id="1_chat_script"]
+
+[sub_resource type="StyleBoxFlat" id="ChatPanel"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.07, 0.065, 0.13, 0.89)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.48, 0.38, 0.68, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="ChatOverlay" type="CanvasLayer" unique_id=1190262946]
+layer = 8
+script = ExtResource("1_chat_script")
+
+[node name="ChatWindow" type="PanelContainer" parent="." unique_id=897055788]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -265.0
+offset_right = 226.0
+offset_bottom = -16.0
+grow_vertical = 0
+mouse_filter = 1
+theme_override_styles/panel = SubResource("ChatPanel")
+
+[node name="Contents" type="VBoxContainer" parent="ChatWindow" unique_id=818360699]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="ChatWindow/Contents" unique_id=407535020]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ChatTitle" type="Label" parent="ChatWindow/Contents/Header" unique_id=1770074287]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "CHAT"
+
+[node name="HeaderSpacer" type="Control" parent="ChatWindow/Contents/Header" unique_id=296082056]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ChannelLabel" type="Label" parent="ChatWindow/Contents/Header" unique_id=1363855033]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "GLOBAL"
+
+[node name="ChatLog" type="RichTextLabel" parent="ChatWindow/Contents" unique_id=1372625218]
+custom_minimum_size = Vector2(0, 155)
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+scroll_following = true
+selection_enabled = true
+
+[node name="ChatEntry" type="LineEdit" parent="ChatWindow/Contents" unique_id=9020264]
+visible = false
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+placeholder_text = "Message everyone..."
+max_length = 200
+
+[node name="HintLabel" type="Label" parent="ChatWindow/Contents" unique_id=1336510769]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.69, 0.68, 0.77, 1)
+theme_override_font_sizes/font_size = 12
+text = "Enter global   ·   T team"
