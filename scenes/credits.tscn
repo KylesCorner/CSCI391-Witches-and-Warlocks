@@ -1,0 +1,114 @@
+[gd_scene format=3 uid="uid://divtuvct613qm"]
+
+[ext_resource type="Script" uid="uid://cof1thuwku57g" path="res://scripts/ui/credits.gd" id="1_credits"]
+
+[sub_resource type="StyleBoxFlat" id="CreditsPanel"]
+content_margin_left = 28.0
+content_margin_top = 22.0
+content_margin_right = 28.0
+content_margin_bottom = 22.0
+bg_color = Color(0.09, 0.075, 0.15, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.47, 0.35, 0.72, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="Credits" type="Control" unique_id=1555903505]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_credits")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2085412655]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.035, 0.025, 0.07, 1)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1278320820]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=993909722]
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("CreditsPanel")
+
+[node name="Content" type="VBoxContainer" parent="Center/Panel" unique_id=2118365803]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="GameTitle" type="Label" parent="Center/Panel/Content" unique_id=1741715771]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 36
+text = "WITCHES & WARLOCKS"
+horizontal_alignment = 1
+
+[node name="CreditsTitle" type="Label" parent="Center/Panel/Content" unique_id=1252181057]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.62, 1, 1)
+theme_override_font_sizes/font_size = 21
+text = "CREDITS"
+horizontal_alignment = 1
+
+[node name="Winner" type="Label" parent="Center/Panel/Content" unique_id=449413470]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.48, 1)
+theme_override_font_sizes/font_size = 28
+text = "MATCH RESULTS"
+horizontal_alignment = 1
+
+[node name="RoundScore" type="Label" parent="Center/Panel/Content" unique_id=554600560]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "ROUND WINS"
+horizontal_alignment = 1
+
+[node name="DamageScore" type="Label" parent="Center/Panel/Content" unique_id=1502164549]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "TOTAL DAMAGE"
+horizontal_alignment = 1
+
+[node name="RoundHistory" type="Label" parent="Center/Panel/Content" unique_id=1559942742]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.81, 0.78, 0.92, 1)
+theme_override_font_sizes/font_size = 15
+text = "ROUND HISTORY"
+horizontal_alignment = 1
+
+[node name="TeamCredits" type="Label" parent="Center/Panel/Content" unique_id=486409479]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.79, 0.73, 0.91, 1)
+theme_override_font_sizes/font_size = 16
+text = "A CSCI391 GAME PROJECT
+
+Developers:
+- Kyle Krstulich
+- K
+- Ingrid"
+horizontal_alignment = 1
+
+[node name="ReturnButton" type="Button" parent="Center/Panel/Content" unique_id=659233150]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+focus_mode = 0
+text = "RETURN TO LOBBY"
