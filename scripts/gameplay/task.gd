@@ -1,7 +1,7 @@
 class_name WorldTask
 extends Area2D
 
-const OUTLINE_MATERIAL: ShaderMaterial = preload("res://shaders/task_outline_material.tres")
+const OUTLINE_MATERIAL_PATH: String = "res://shaders/task_outline_material.tres"
 
 enum TaskKind {
 	CONTACT_PATRON,
@@ -26,6 +26,13 @@ var _local_overlap_count: int = 0
 
 func _ready() -> void:
 	add_to_group("interactable")
+
+	# A dedicated-server export strips visual materials into PlaceholderMaterial.
+	# The server still uses task_kind/config for authoritative validation,
+	# but must not load or initialize client-only outline visuals.
+	if OS.has_feature("dedicated_server"):
+		return
+
 	_apply_config()
 	_setup_outline_detection()
 	MatchManager.tasks_changed.connect(_on_tasks_changed)
@@ -100,7 +107,12 @@ func _update_outline() -> void:
 	var local_player: PlayerController = _get_local_player()
 	if _local_overlap_count > 0 and local_player != null and can_interact(local_player):
 		if _outline_material == null:
-			_outline_material = OUTLINE_MATERIAL.duplicate() as ShaderMaterial
+			# Load lazily on the client. Server exports may not include a
+			# ShaderMaterial at this path because visuals get stripped.
+			var material_resource: Resource = load(OUTLINE_MATERIAL_PATH)
+			if material_resource is not ShaderMaterial:
+				return
+			_outline_material = (material_resource as ShaderMaterial).duplicate() as ShaderMaterial
 		sprite.material = _outline_material
 	else:
 		sprite.material = null
