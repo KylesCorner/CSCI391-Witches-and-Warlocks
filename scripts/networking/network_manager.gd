@@ -294,42 +294,60 @@ func _on_server_disconnected() -> void:
 	server_disconnected.emit()
 
 
-func _on_peer_disconnected(
-	peer_id: int
-) -> void:
-
+func _on_peer_disconnected(peer_id: int) -> void:
 	if not multiplayer.is_server():
 		return
 
+	print("Player disconnected: ", peer_id)
 
-	print(
-		"Player disconnected: ",
-		peer_id
-	)
+	players.erase(peer_id)
+	loaded_players.erase(peer_id)
 
+	# Remove the character from the server immediately.
+	_despawn_player_local(peer_id)
 
-	players.erase(
-		peer_id
-	)
-
-
-	loaded_players.erase(
-		peer_id
-	)
-
+	# Tell all remaining clients to remove the character.
+	despawn_player.rpc(peer_id)
 
 	if peer_id == lobby_leader_id:
-
 		_assign_new_lobby_leader()
-
 
 	_sync_lobby()
 
-
-	if session_state == \
-			SessionState.LOADING:
-
+	if session_state == SessionState.LOADING:
 		_check_all_game_loaded()
+
+
+@rpc("authority", "call_remote", "reliable")
+func despawn_player(peer_id: int) -> void:
+	_despawn_player_local(peer_id)
+
+
+func _despawn_player_local(peer_id: int) -> void:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+
+	var players_node := scene.get_node_or_null(
+        "WorldView/WorldViewport/World/Players"
+	)
+
+	if players_node == null:
+		return
+
+	var player := players_node.get_node_or_null(
+		str(peer_id)
+	)
+
+	if player == null:
+		return
+
+	# Immediately remove it from the scene tree so
+	# its scripts stop processing and receiving signals.
+	players_node.remove_child(player)
+	player.queue_free()
+
+	print("Despawned disconnected player: ", peer_id)
 
 
 #

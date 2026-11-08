@@ -342,6 +342,7 @@ func _on_phase_changed(next_phase: int, _round: int) -> void:
 	_end_invisibility()
 	used_counts = PackedInt32Array([0, 0, 0, 0])
 	var owner_id: int = player.get_multiplayer_authority()
-	if owner_id != 1:
+	if owner_id != 1 \
+	and owner_id in multiplayer.get_peers():
 		sync_used_counts.rpc_id(owner_id, used_counts)
 	ability_state_changed.emit()
