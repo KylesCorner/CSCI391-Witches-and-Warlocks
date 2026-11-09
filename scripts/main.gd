@@ -18,25 +18,13 @@ const PLAYER_HUD_SCENE: PackedScene = preload("res://scenes/players/player_hud.t
 ]
 
 func _ready() -> void:
-	_fit_world_viewport()
-	if not get_viewport().size_changed.is_connected(_fit_world_viewport):
-		get_viewport().size_changed.connect(_fit_world_viewport)
+	# SubViewportContainer.stretch already sizes WorldViewport.
+	# Do not manually resize the viewport during window drag.
+	# This avoids redundant viewport work and leaves the world visible.
 	if multiplayer.is_server():
 		NetworkManager.all_players_loaded.connect(_spawn_all_players)
 	await get_tree().process_frame
 	NetworkManager.report_game_loaded()
-	
-func _fit_world_viewport() -> void:
-	if multiplayer.is_server():
-		return
-
-	var vp_size: Vector2i = get_viewport().get_visible_rect().size
-
-	if vp_size.x < 1 or vp_size.y < 1:
-		return
-
-	world_view.position = Vector2.ZERO
-	world_view.size = Vector2(vp_size)
 
 func get_world_root() -> Node2D:
 	return world
