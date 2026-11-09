@@ -8,19 +8,19 @@ extends Control
 #
 
 @onready var player_name: LineEdit = \
-	$Panel/VBoxContainer/PlayerName
+	$Center/Panel/VBoxContainer/PlayerName
 
 
 @onready var address: LineEdit = \
-	$Panel/VBoxContainer/IPAddress
+	$Center/Panel/VBoxContainer/IPAddress
 
 
 @onready var join_button: Button = \
-	$Panel/VBoxContainer/JoinButton
+	$Center/Panel/VBoxContainer/JoinButton
 
 
 @onready var status_label: Label = \
-	$Panel/VBoxContainer/StatusLabel
+	$Center/Panel/VBoxContainer/StatusLabel
 
 
 #
@@ -29,32 +29,40 @@ extends Control
 # ============================================================
 #
 
+@onready var players_header: Label = \
+	$Center/Panel/VBoxContainer/PlayersHeader
+
+
+@onready var player_list_panel: PanelContainer = \
+	$Center/Panel/VBoxContainer/PlayerListPanel
+
+
 @onready var player_list: VBoxContainer = \
-	$Panel/VBoxContainer/PlayerList
+	$Center/Panel/VBoxContainer/PlayerListPanel/PlayerList
 
 
 @onready var class_label: Label = \
-	$Panel/VBoxContainer/ClassLabel
+	$Center/Panel/VBoxContainer/ClassLabel
 
 
 @onready var classes_container: HBoxContainer = \
-	$Panel/VBoxContainer/HBoxContainer2
+	$Center/Panel/VBoxContainer/HBoxContainer2
 
 
 @onready var warlock_button: Button = \
-	$Panel/VBoxContainer/HBoxContainer2/WarlockButton
+	$Center/Panel/VBoxContainer/HBoxContainer2/WarlockButton
 
 
 @onready var witch_button: Button = \
-	$Panel/VBoxContainer/HBoxContainer2/WitchButton
+	$Center/Panel/VBoxContainer/HBoxContainer2/WitchButton
 
 
 @onready var ready_button: Button = \
-	$Panel/VBoxContainer/ReadyButton
+	$Center/Panel/VBoxContainer/ReadyButton
 
 
 @onready var start_button: Button = \
-	$Panel/VBoxContainer/StartButton
+	$Center/Panel/VBoxContainer/StartButton
 
 
 #
@@ -149,7 +157,10 @@ func _set_connected_ui(
 	# These controls only exist visually
 	# once we are connected to a server.
 	#
-	player_list.visible = \
+	players_header.visible = \
+		connected
+
+	player_list_panel.visible = \
 		connected
 
 	class_label.visible = \
@@ -478,8 +489,24 @@ func _update_lobby() -> void:
 		var row := Label.new()
 
 
+		row.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		row.add_theme_font_size_override("font_size", 14)
+
+
+		if player_ready:
+			row.add_theme_color_override(
+				"font_color",
+				Color(0.72, 0.92, 0.78, 1.0)
+			)
+		else:
+			row.add_theme_color_override(
+				"font_color",
+				Color(0.86, 0.8, 0.95, 1.0)
+			)
+
+
 		row.text = \
-			"%s%s | %s | %s" % [
+			"%s%s  ·  %s  ·  %s" % [
 				display_name,
 				leader_text,
 				selected_class.capitalize(),
