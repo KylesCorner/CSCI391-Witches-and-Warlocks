@@ -24,6 +24,14 @@ var _result_label: Label = null
 var _servers: Dictionary = {} # key: source-IP:game-port
 var _scan_remaining: float = 0.0
 
+# Keep the original lobby controls, including their existing signal connections.
+# They will be reparented into the Find Servers overlay after lobby._ready().
+var _address_label: Label = null
+var _ip_field: LineEdit = null
+var _join_button: Button = null
+var _name_field: LineEdit = null
+var _status_label: Label = null
+
 
 func _ready() -> void:
 	set_process(false)
@@ -199,6 +207,11 @@ func _on_scene_changed() -> void:
 	_overlay = null
 	_server_rows = null
 	_result_label = null
+	_address_label = null
+	_ip_field = null
+	_join_button = null
+	_name_field = null
+	_status_label = null
 
 	var scene: Node = get_tree().current_scene
 	if scene == null or scene.scene_file_path != LOBBY_PATH:
@@ -212,23 +225,26 @@ func _on_scene_changed() -> void:
 		push_warning("LAN browser could not locate lobby's VBoxContainer")
 		return
 	_lobby_fields = fields
+	_address_label = fields.get_node_or_null("AddressLabel") as Label
+	_ip_field = fields.get_node_or_null("IPAddress") as LineEdit
+	_join_button = fields.get_node_or_null("JoinButton") as Button
+	_name_field = fields.get_node_or_null("PlayerName") as LineEdit
+	_status_label = fields.get_node_or_null("StatusLabel") as Label
+	if _address_label == null or _ip_field == null or _join_button == null:
+		push_warning("LAN browser could not locate the manual IP controls")
+		return
 
 	_browser_button = Button.new()
 	_browser_button.name = "FindLanServersButton"
-	_browser_button.text = "FIND LAN SERVERS"
+	_browser_button.text = "FIND SERVERS"
 	_browser_button.custom_minimum_size = Vector2(0, 42)
-	_browser_button.tooltip_text = "Discover Witches & Warlocks dedicated servers on your LAN"
+	_browser_button.tooltip_text = "Find LAN servers or connect to a server by IP address"
 	fields.add_child(_browser_button)
-	var ip_field: Control = fields.get_node_or_null("IPAddress") as Control
-	if ip_field != null:
-		fields.move_child(_browser_button, ip_field.get_index() + 1)
+	fields.move_child(_browser_button, _address_label.get_index())
 	_browser_button.pressed.connect(_show_browser)
 
-	# The extra button makes the original centered lobby taller than the
-	# game window. Put its existing CenterContainer inside a ScrollContainer
-	# so every control remains reachable at 720p and in smaller windows.
-	# SceneTree.scene_changed fires after lobby._ready(), so all lobby.gd
-	# @onready references have already been resolved before reparenting.
+	# SceneTree.scene_changed fires after lobby._ready(), so the lobby's
+	# @onready references and JoinButton signal are already initialized.
 	_make_lobby_scrollable()
 	_build_overlay()
 
@@ -253,8 +269,7 @@ func _make_lobby_scrollable() -> void:
 	_lobby.add_child(scroll)
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	# Keep the original CenterContainer and Panel, including all their
-	# theme resources and node references, instead of rebuilding the lobby.
+	# Keep the original centered lobby layout, styles, and node references.
 	center.reparent(scroll)
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -298,13 +313,13 @@ func _build_overlay() -> void:
 	margin.add_child(content)
 
 	var title: Label = Label.new()
-	title.text = "LOCAL SERVER BROWSER"
+	title.text = "FIND SERVERS"
 	title.add_theme_font_size_override("font_size", 23)
 	title.add_theme_color_override("font_color", Color(0.87, 0.76, 1.0))
 	content.add_child(title)
 
 	var hint: Label = Label.new()
-	hint.text = "Servers on the same LAN  |  UDP 7001 discovery  |  ENet 7000 game"
+	hint.text = "Local servers  |  UDP 7001 discovery  |  ENet 7000 game"
 	hint.add_theme_font_size_override("font_size", 12)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.65, 0.81))
 	content.add_child(hint)
@@ -314,7 +329,7 @@ func _build_overlay() -> void:
 	content.add_child(_result_label)
 
 	var scroll: ScrollContainer = ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(560, 240)
+	scroll.custom_minimum_size = Vector2(560, 185)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_child(scroll)
 
@@ -322,6 +337,25 @@ func _build_overlay() -> void:
 	_server_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_server_rows.add_theme_constant_override("separation", 8)
 	scroll.add_child(_server_rows)
+
+	# Move the EXISTING lobby controls, not copies. The lobby script still
+	# holds their references and their original ENet join signal remains wired.
+	var divider: HSeparator = HSeparator.new()
+	content.add_child(divider)
+
+	var manual_title: Label = Label.new()
+	manual_title.text = "CONNECT DIRECTLY"
+	manual_title.add_theme_font_size_override("font_size", 15)
+	manual_title.add_theme_color_override("font_color", Color(0.87, 0.76, 1.0))
+	content.add_child(manual_title)
+
+	_address_label.reparent(content)
+	_ip_field.reparent(content)
+	_ip_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_join_button.reparent(content)
+	_join_button.text = "JOIN BY IP"
+	# When the existing join action starts, return to the lobby to show status.
+	_join_button.pressed.connect(_hide_browser)
 
 	var buttons: HBoxContainer = HBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 10)
@@ -367,11 +401,11 @@ func _render_servers() -> void:
 		child.queue_free()
 
 	if _socket == null:
-		_result_label.text = "Discovery unavailable; use the manual IP field."
+		_result_label.text = "Discovery unavailable; connect directly using the IP field below."
 		return
 
 	if _servers.is_empty():
-		_result_label.text = "Searching LAN..." if _scan_remaining > 0.0 else "No servers found. Check UDP 7001 and refresh."
+		_result_label.text = "Searching LAN..." if _scan_remaining > 0.0 else "No LAN servers found. Refresh or join by IP below."
 		return
 
 	_result_label.text = "Found %d LAN server(s)" % _servers.size()
@@ -414,24 +448,15 @@ func _render_servers() -> void:
 func _join_selected(ip: String) -> void:
 	if _lobby == null or not is_instance_valid(_lobby):
 		return
-
-	# The CenterContainer now lives under LobbyScroll. Reuse the original
-	# VBoxContainer reference rather than looking up its former node path.
-	if _lobby_fields == null or not is_instance_valid(_lobby_fields):
-		return
-	var ip_field: LineEdit = _lobby_fields.get_node_or_null("IPAddress") as LineEdit
-	var name_field: LineEdit = _lobby_fields.get_node_or_null("PlayerName") as LineEdit
-	var join_button: Button = _lobby_fields.get_node_or_null("JoinButton") as Button
-	var status_label: Label = _lobby_fields.get_node_or_null("StatusLabel") as Label
-	if ip_field == null or name_field == null or join_button == null:
+	if _ip_field == null or _join_button == null or _name_field == null:
 		return
 
-	# Use the lobby's existing ENet join function. Never duplicate it.
-	ip_field.text = ip
+	# Reuse the lobby's existing ENet join routine for discovered servers.
+	_ip_field.text = ip
 	_hide_browser()
-	if name_field.text.strip_edges().is_empty():
-		name_field.grab_focus()
-		if status_label != null:
-			status_label.text = "Enter a player name, then click JOIN SERVER."
+	if _name_field.text.strip_edges().is_empty():
+		_name_field.grab_focus()
+		if _status_label != null:
+			_status_label.text = "Enter a player name, then click FIND SERVERS to join."
 		return
-	join_button.emit_signal("pressed")
+	_join_button.emit_signal("pressed")

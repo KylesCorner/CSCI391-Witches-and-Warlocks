@@ -52,7 +52,6 @@ func _ready() -> void:
 
 func _create_overlay_labels() -> void:
 	var root: Control = $HUDRoot
-
 	_phase_label = Label.new()
 	_phase_label.name = "PhaseStatus"
 	_phase_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -99,7 +98,6 @@ func bind_player(new_player: PlayerController) -> void:
 	if not is_node_ready() or controlled_player != null:
 		push_error("PlayerHUD must be ready and unbound before bind_player().")
 		return
-
 	controlled_player = new_player
 	_peer_id = multiplayer.get_unique_id()
 	ability_controller = new_player.get_node_or_null("AbilityController") as AbilityController
@@ -181,16 +179,14 @@ func _refresh_abilities() -> void:
 	for index in range(4):
 		var earned: int = MatchManager.get_ability_count(_peer_id, index)
 		var remaining: int = ability_controller.get_remaining_charges(index)
-		var implemented: bool = index != 2  # Summon/Murder Cat is not implemented.
+		var implemented: bool = true  # Including Summon Husk / Murder Cat (slot 3).
 		var can_cast: bool = remaining > 0 and in_fight and implemented
 		if AbilityController.DEV_MODE:
 			can_cast = implemented
 		ability_slots[index].disabled = not can_cast
 
 		var state: String
-		if not implemented:
-			state = "%d STORED | COMING SOON" % remaining
-		elif AbilityController.DEV_MODE:
+		if AbilityController.DEV_MODE:
 			state = "DEV MODE"
 		elif earned == 0:
 			state = "LOCKED"
@@ -250,7 +246,6 @@ func _process(delta: float) -> void:
 	if _prompt_elapsed < 0.15:
 		return
 	_prompt_elapsed = 0.0
-
 	var target: Node = controlled_player._get_closest_interactable()
 	if target == null or not target.has_method("can_interact"):
 		_prompt_label.text = ""
@@ -258,7 +253,6 @@ func _process(delta: float) -> void:
 	if not target.can_interact(controlled_player):
 		_prompt_label.text = ""
 		return
-
 	var display: String = str(target.name)
 	if target is WorldTask:
 		var task: WorldTask = target as WorldTask
