@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bsdbi44kusof7"]
+
+[ext_resource type="Script" uid="uid://d0braut3fxb6y" path="res://scripts/gameplay/summon.gd" id="1_summon"]
+[ext_resource type="SpriteFrames" path="res://assets/animations/warlock_summon.tres" id="2_warlock"]
+[ext_resource type="SpriteFrames" path="res://assets/animations/witch_summon.tres" id="3_witch"]
+
+[sub_resource type="CircleShape2D" id="SummonCollision"]
+radius = 6.0
+
+[node name="Summon" type="CharacterBody2D" unique_id=1906347894]
+collision_layer = 2
+script = ExtResource("1_summon")
+
+[node name="Animations" type="Node2D" parent="." unique_id=1148041143]
+
+[node name="Warlock" type="AnimatedSprite2D" parent="Animations" unique_id=484868492]
+sprite_frames = ExtResource("2_warlock")
+animation = &"Default"
+
+[node name="Witch" type="AnimatedSprite2D" parent="Animations" unique_id=2008969206]
+visible = false
+sprite_frames = ExtResource("3_witch")
+animation = &"Default"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1044100495]
+shape = SubResource("SummonCollision")

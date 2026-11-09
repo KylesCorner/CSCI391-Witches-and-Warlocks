@@ -1,16 +1,15 @@
 class_name AbilityController
 extends Node
 
-# Every task completion grants one charge, up to MatchManager.MAX_CHARGES_PER_ABILITY.
-# Set to true temporarily only when testing spells without completing tasks.
+# Each completed task grants one charge (up to MatchManager.MAX_CHARGES_PER_ABILITY).
 const DEV_MODE: bool = false
 const DEV_UNLOCK_ALL: bool = DEV_MODE
 const DEV_UNLIMITED_CASTS: bool = DEV_MODE
 
 const PROJECTILE_SCENE: PackedScene = preload("res://scenes/gameplay/spell_projectile.tscn")
+const SUMMON_SCENE: PackedScene = preload("res://scenes/gameplay/summon.tscn")
 const INVISIBLE_ALLY_ALPHA: float = 0.35
-const INVISIBLE_SPEED_MULTIPLIER: float = 2.0
-
+const INVISIBLE_SPEED_MULTIPLIER: float = 1.5
 
 const ABILITIES: Array[Dictionary] = [
 	{"type": "projectile", "damage": 25, "speed": 550.0, "range": 350.0, "radius": 5.0},
@@ -28,9 +27,12 @@ signal ability_error(message: String)
 var used_counts: PackedInt32Array = PackedInt32Array([0, 0, 0, 0])
 var next_projectile_id: int = 0
 var projectiles: Dictionary = {}
+var next_summon_id: int = 0
+var summons: Dictionary = {}
+var _summon_net_elapsed: Dictionary = {}
 var invisibility_active: bool = false
-var normal_movement_speed: float = 0.0
 var invisibility_timer: Timer
+var _normal_speed: float = 0.0
 
 
 func _ready() -> void:
@@ -55,7 +57,7 @@ func _process(_delta: float) -> void:
 			break
 
 
-# Used by both the HUD buttons and the 1-4 keyboard shortcuts.
+# The HUD uses this function too.
 func try_cast(slot: int) -> void:
 	if multiplayer.is_server() or not player.is_multiplayer_authority():
 		return
@@ -63,9 +65,6 @@ func try_cast(slot: int) -> void:
 		return
 	if player.current_health <= 0:
 		ability_error.emit("Cannot cast while defeated")
-		return
-	if slot == 2:
-		ability_error.emit("Summon ability is not implemented yet")
 		return
 	if slot == 3 and invisibility_active:
 		ability_error.emit("Invisibility is already active")
@@ -98,10 +97,8 @@ func request_cast(slot: int, target_position: Vector2) -> void:
 		return
 	if player.current_health <= 0 or not target_position.is_finite():
 		return
-	if slot == 2:
-		return  # The summon ability is not implemented yet.
 	if slot == 3 and invisibility_active:
-		return  # A second cast should not waste a charge while invisible.
+		return
 	if not DEV_MODE:
 		if MatchManager.phase != MatchManager.Phase.FIGHT:
 			return
@@ -115,6 +112,9 @@ func request_cast(slot: int, target_position: Vector2) -> void:
 				return
 			_consume_ability(slot, sender)
 			_launch_projectile(slot, target_position)
+		"summon":
+			_consume_ability(slot, sender)
+			_start_summon(config)
 		"invisibility":
 			_consume_ability(slot, sender)
 			_start_invisibility(float(config["duration"]))
@@ -129,7 +129,7 @@ func _consume_ability(slot: int, owner_id: int) -> void:
 	ability_state_changed.emit()
 
 
-# Server-owned projectile collision and damage; clients render the effects.
+# Server-owned projectile collision and damage; clients render effects.
 func _launch_projectile(slot: int, mouse_position: Vector2) -> void:
 	var config: Dictionary = ABILITIES[slot]
 	var delta: Vector2 = mouse_position - player.global_position
@@ -139,7 +139,6 @@ func _launch_projectile(slot: int, mouse_position: Vector2) -> void:
 	var direction: Vector2 = delta / distance
 	var origin: Vector2
 	var flight_range: float
-
 	if str(config["type"]) == "explosion":
 		var capped: float = minf(distance, float(config["range"]))
 		var offset: float = minf(18.0, capped * 0.5)
@@ -187,6 +186,11 @@ func _spawn_local_projectile(id: int, slot: int, origin: Vector2,
 	projectile.set_visual(player.class_id, slot)
 	projectiles[id] = projectile
 	if is_server:
+		# Our own team's minions must not absorb friendly projectiles.
+		for node in get_tree().get_nodes_in_group("summons"):
+			var summon: Summon = node as Summon
+			if summon != null and summon.team == player.class_id:
+				projectile.add_collision_exception_with(summon)
 		projectile.finished.connect(_on_projectile_finished.bind(id, slot))
 	else:
 		var duration: float = flight_range / maxf(float(config["speed"]), 1.0) + 4.0
@@ -206,6 +210,11 @@ func _on_projectile_finished(target: Node2D, hit_position: Vector2,
 
 
 func _apply_direct_damage(body: Node2D, damage: int) -> void:
+	var summon: Summon = body as Summon
+	if summon != null:
+		if summon.team != player.class_id:
+			summon.take_hit()
+		return
 	var target: PlayerController = body as PlayerController
 	if target != null and target.class_id != player.class_id:
 		target.take_damage(damage)
@@ -217,12 +226,18 @@ func _apply_explosion(position: Vector2, config: Dictionary) -> void:
 	var query := PhysicsShapeQueryParameters2D.new()
 	query.shape = shape
 	query.transform = Transform2D(0.0, position)
-	query.collision_mask = 1
+	query.collision_mask = 3  # Players/terrain: 1; minions: 2.
 	query.exclude = [player.get_rid()]
 	var hits: Array[Dictionary] = player.get_world_2d().direct_space_state.intersect_shape(query, 32)
 	var seen: Dictionary = {}
 	for hit in hits:
-		var target: PlayerController = hit["collider"] as PlayerController
+		var candidate: Object = hit["collider"]
+		if candidate is Summon:
+			var summon: Summon = candidate as Summon
+			if summon.team != player.class_id:
+				summon.take_hit()
+			continue
+		var target: PlayerController = candidate as PlayerController
 		if target == null or target.class_id == player.class_id:
 			continue
 		var instance: int = target.get_instance_id()
@@ -269,6 +284,116 @@ func _remove_projectile(id: int) -> void:
 		projectile.queue_free()
 
 
+# ============================================================
+# SUMMON / MURDER CAT (SERVER-AUTHORITATIVE)
+# ============================================================
+
+func _start_summon(config: Dictionary) -> void:
+	if not multiplayer.is_server():
+		return
+	var id: int = next_summon_id
+	next_summon_id += 1
+	var forward: Vector2 = player.velocity.normalized()
+	if forward == Vector2.ZERO:
+		forward = Vector2.RIGHT
+	var origin: Vector2 = player.global_position + forward * 32.0
+	_spawn_local_summon(id, origin, player.class_id,
+		float(config["duration"]), int(config["contact_damage"]))
+	spawn_summon_fx.rpc(id, origin, player.class_id,
+		float(config["duration"]), int(config["contact_damage"]))
+
+
+func _spawn_local_summon(id: int, origin: Vector2, team: String,
+		duration: float, damage: int) -> void:
+	if summons.has(id):
+		return
+	var summon: Summon = SUMMON_SCENE.instantiate() as Summon
+	if summon == null:
+		push_error("summon.tscn must use Summon as its root script")
+		return
+	summon.name = "Summon_%d_%d" % [player.get_multiplayer_authority(), id]
+	_get_world_root().add_child(summon)
+	summon.global_position = origin
+	summon.configure(self, id, player.get_multiplayer_authority(), team, duration, damage)
+	summons[id] = summon
+	_summon_net_elapsed[id] = 0.0
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func spawn_summon_fx(id: int, origin: Vector2, team: String,
+		duration: float, damage: int) -> void:
+	if multiplayer.get_remote_sender_id() != 1 or multiplayer.is_server():
+		return
+	if team != player.class_id or not origin.is_finite():
+		return
+	_spawn_local_summon(id, origin, team, duration, damage)
+
+
+func broadcast_summon_motion(id: int, position: Vector2,
+		motion_velocity: Vector2, delta: float) -> void:
+	if not multiplayer.is_server() or not summons.has(id):
+		return
+	var elapsed: float = float(_summon_net_elapsed.get(id, 0.0)) + delta
+	if elapsed < 0.10:
+		_summon_net_elapsed[id] = elapsed
+		return
+	_summon_net_elapsed[id] = fmod(elapsed, 0.10)
+	sync_summon_motion.rpc(id, position, motion_velocity)
+
+
+@rpc("any_peer", "call_remote", "unreliable_ordered")
+func sync_summon_motion(id: int, position: Vector2, motion_velocity: Vector2) -> void:
+	if multiplayer.get_remote_sender_id() != 1 or multiplayer.is_server():
+		return
+	if not position.is_finite() or not motion_velocity.is_finite():
+		return
+	var summon: Summon = summons.get(id) as Summon
+	if summon != null:
+		summon.set_remote_motion(position, motion_velocity)
+
+
+func broadcast_summon_attack(id: int) -> void:
+	if multiplayer.is_server() and summons.has(id):
+		sync_summon_attack.rpc(id)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func sync_summon_attack(id: int) -> void:
+	if multiplayer.get_remote_sender_id() != 1 or multiplayer.is_server():
+		return
+	var summon: Summon = summons.get(id) as Summon
+	if summon != null:
+		summon.show_attack()
+
+
+func despawn_summon(id: int) -> void:
+	if not multiplayer.is_server() or not summons.has(id):
+		return
+	var summon: Summon = summons[id] as Summon
+	summons.erase(id)
+	_summon_net_elapsed.erase(id)
+	despawn_summon_fx.rpc(id)
+	if is_instance_valid(summon):
+		summon.queue_free()
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func despawn_summon_fx(id: int) -> void:
+	if multiplayer.get_remote_sender_id() != 1 or multiplayer.is_server():
+		return
+	if not summons.has(id):
+		return
+	var summon: Summon = summons[id] as Summon
+	summons.erase(id)
+	_summon_net_elapsed.erase(id)
+	if is_instance_valid(summon):
+		summon.disappear()
+
+
+# ============================================================
+# INVISIBILITY (INCLUDES OWNER-ONLY 1.5x MOVEMENT SPEED)
+# ============================================================
+
 func _start_invisibility(duration: float) -> void:
 	if not multiplayer.is_server():
 		return
@@ -292,18 +417,16 @@ func _end_invisibility() -> void:
 func sync_invisibility(active: bool) -> void:
 	if multiplayer.get_remote_sender_id() != 1:
 		return
-
 	if active and not invisibility_active:
-		normal_movement_speed = player.speed
+		_normal_speed = player.speed
 		if player.is_multiplayer_authority():
 			player.speed *= INVISIBLE_SPEED_MULTIPLIER
-
 	elif not active and invisibility_active:
 		if player.is_multiplayer_authority():
-			player.speed = normal_movement_speed
-
+			player.speed = _normal_speed
 	invisibility_active = active
 	_apply_invisibility_visual(active)
+
 
 func _apply_invisibility_visual(active: bool) -> void:
 	var sprite: AnimatedSprite2D = player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
@@ -326,7 +449,6 @@ func _apply_invisibility_visual(active: bool) -> void:
 		tag.visible = not owner and not (active and not ally)
 
 
-# Number of casts still available for one ability (earned minus used).
 func get_remaining_charges(slot: int) -> int:
 	if slot < 0 or slot >= ABILITIES.size():
 		return 0
@@ -352,9 +474,10 @@ func _on_phase_changed(next_phase: int, _round: int) -> void:
 	if not multiplayer.is_server() or next_phase != MatchManager.Phase.PREPARE:
 		return
 	_end_invisibility()
+	for id in summons.keys():
+		despawn_summon(int(id))
 	used_counts = PackedInt32Array([0, 0, 0, 0])
 	var owner_id: int = player.get_multiplayer_authority()
-	if owner_id != 1 \
-	and owner_id in multiplayer.get_peers():
+	if owner_id != 1 and owner_id in multiplayer.get_peers():
 		sync_used_counts.rpc_id(owner_id, used_counts)
 	ability_state_changed.emit()

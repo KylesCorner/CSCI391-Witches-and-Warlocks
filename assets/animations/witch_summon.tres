@@ -1,0 +1,25 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://b8m2eq3lyhqow"]
+
+[ext_resource type="Texture2D" uid="uid://bvnji01nwihyb" path="res://assets/Black-Idle.png" id="1_cat"]
+
+[sub_resource type="AtlasTexture" id="CatFrameA"]
+atlas = ExtResource("1_cat")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="CatFrameB"]
+atlas = ExtResource("1_cat")
+region = Rect2(48, 0, 48, 48)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("CatFrameA")
+}, {
+"duration": 1.0,
+"texture": SubResource("CatFrameB")
+}],
+"loop": 1,
+"name": &"Default",
+"speed": 7.0
+}]
