@@ -508,8 +508,8 @@ func _ensure_overlay() -> void:
 
 	var panel: PanelContainer = PanelContainer.new()
 	panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	panel.offset_left = -350.0
-	panel.offset_right = 350.0
+	panel.offset_left = -280.0
+	panel.offset_right = 280.0
 	panel.offset_top = 52.0
 	panel.offset_bottom = 151.0
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
