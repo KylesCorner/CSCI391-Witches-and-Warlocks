@@ -14,11 +14,15 @@ script = ExtResource("1_summon")
 [node name="Animations" type="Node2D" parent="." unique_id=1148041143]
 
 [node name="Warlock" type="AnimatedSprite2D" parent="Animations" unique_id=484868492]
+position = Vector2(-0.99999976, -2.3841858e-07)
+scale = Vector2(0.7083333, 0.7083333)
 sprite_frames = ExtResource("2_warlock")
 animation = &"Default"
 
 [node name="Witch" type="AnimatedSprite2D" parent="Animations" unique_id=2008969206]
 visible = false
+position = Vector2(0, -4)
+scale = Vector2(0.34374997, 0.34374997)
 sprite_frames = ExtResource("3_witch")
 animation = &"Default"
 
