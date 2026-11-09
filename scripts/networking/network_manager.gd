@@ -40,7 +40,7 @@ var session_state: SessionState = \
 
 const PORT: int = 7000
 
-const MAX_PLAYERS: int = 4
+const MAX_PLAYERS: int = 8
 
 #
 # Keep at 1 while developing.
