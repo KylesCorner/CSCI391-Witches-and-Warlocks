@@ -9,6 +9,8 @@ const DEV_UNLIMITED_CASTS: bool = DEV_MODE
 
 const PROJECTILE_SCENE: PackedScene = preload("res://scenes/gameplay/spell_projectile.tscn")
 const INVISIBLE_ALLY_ALPHA: float = 0.35
+const INVISIBLE_SPEED_MULTIPLIER: float = 2.0
+
 
 const ABILITIES: Array[Dictionary] = [
 	{"type": "projectile", "damage": 25, "speed": 550.0, "range": 350.0, "radius": 5.0},
@@ -27,6 +29,7 @@ var used_counts: PackedInt32Array = PackedInt32Array([0, 0, 0, 0])
 var next_projectile_id: int = 0
 var projectiles: Dictionary = {}
 var invisibility_active: bool = false
+var normal_movement_speed: float = 0.0
 var invisibility_timer: Timer
 
 
@@ -289,9 +292,18 @@ func _end_invisibility() -> void:
 func sync_invisibility(active: bool) -> void:
 	if multiplayer.get_remote_sender_id() != 1:
 		return
+
+	if active and not invisibility_active:
+		normal_movement_speed = player.speed
+		if player.is_multiplayer_authority():
+			player.speed *= INVISIBLE_SPEED_MULTIPLIER
+
+	elif not active and invisibility_active:
+		if player.is_multiplayer_authority():
+			player.speed = normal_movement_speed
+
 	invisibility_active = active
 	_apply_invisibility_visual(active)
-
 
 func _apply_invisibility_visual(active: bool) -> void:
 	var sprite: AnimatedSprite2D = player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
