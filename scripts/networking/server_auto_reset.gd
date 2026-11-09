@@ -17,19 +17,21 @@ func _on_peer_disconnected(_peer_id: int) -> void:
 	# handler removes the peer and its player before deciding to reset.
 	if _is_dedicated_server_running():
 		_queue_reset_check()
+		
+func _on_scene_changed(_scene: Node = null) -> void:
+	var scene: Node = get_tree().current_scene
 
-
-func _on_scene_changed(scene: Node) -> void:
-	# A slow scene load can finish AFTER the last client disconnects.
-	# In that case, clear the stale gameplay scene as well.
 	if scene == null or scene.scene_file_path != NetworkManager.GAME_SCENE:
 		return
+
 	if not _is_dedicated_server_running():
 		return
+
 	if NetworkManager.session_state == NetworkManager.SessionState.LOBBY \
 			and NetworkManager.players.is_empty() \
 			and multiplayer.get_peers().is_empty():
 		_queue_reset_check()
+
 
 
 func _queue_reset_check() -> void:

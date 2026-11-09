@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bsdbi44kusof7"]
 
 [ext_resource type="Script" uid="uid://d0braut3fxb6y" path="res://scripts/gameplay/summon.gd" id="1_summon"]
-[ext_resource type="SpriteFrames" path="res://assets/animations/warlock_summon.tres" id="2_warlock"]
-[ext_resource type="SpriteFrames" path="res://assets/animations/witch_summon.tres" id="3_witch"]
+[ext_resource type="SpriteFrames" uid="uid://bto3xcmmyqi1k" path="res://assets/animations/warlock_summon.tres" id="2_warlock"]
+[ext_resource type="SpriteFrames" uid="uid://b8m2eq3lyhqow" path="res://assets/animations/witch_summon.tres" id="3_witch"]
 
 [sub_resource type="CircleShape2D" id="SummonCollision"]
 radius = 6.0

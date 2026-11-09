@@ -46,7 +46,10 @@ func _ready() -> void:
 		add_child(invisibility_timer)
 		invisibility_timer.timeout.connect(_end_invisibility)
 		MatchManager.phase_changed.connect(_on_phase_changed)
-
+		
+func _exit_tree() -> void:
+	if MatchManager.phase_changed.is_connected(_on_phase_changed):
+		MatchManager.phase_changed.disconnect(_on_phase_changed)
 
 func _process(_delta: float) -> void:
 	if multiplayer.is_server() or not player.is_multiplayer_authority():
@@ -469,10 +472,13 @@ func sync_used_counts(counts: PackedInt32Array) -> void:
 	used_counts = counts.duplicate()
 	ability_state_changed.emit()
 
-
 func _on_phase_changed(next_phase: int, _round: int) -> void:
+	if not is_inside_tree():
+		return
+
 	if not multiplayer.is_server() or next_phase != MatchManager.Phase.PREPARE:
 		return
+		
 	_end_invisibility()
 	for id in summons.keys():
 		despawn_summon(int(id))

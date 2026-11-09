@@ -10,8 +10,8 @@ signal match_finished(winning_class: String)
 
 enum Phase { WAITING, PREPARE, FIGHT, FINISHED }
 
-const PREPARE_SECONDS: int = 15
-const FIGHT_SECONDS: int = 10
+const PREPARE_SECONDS: int = 60
+const FIGHT_SECONDS: int = 60
 const MAX_ROUNDS: int = 3
 const WINS_TO_TAKE_MATCH: int = 2
 const MAX_INTERACTION_DISTANCE: float = 45.0

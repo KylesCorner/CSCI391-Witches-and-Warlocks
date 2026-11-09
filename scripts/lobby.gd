@@ -75,6 +75,8 @@ var local_ready: bool = false
 
 var is_connected: bool = false
 
+var leave_button: Button = null
+
 
 #
 # ============================================================
@@ -83,6 +85,8 @@ var is_connected: bool = false
 #
 
 func _ready() -> void:
+
+	_build_leave_button()
 
 	#
 	# Force initial disconnected UI.
@@ -140,6 +144,24 @@ func _ready() -> void:
 	)
 
 
+# Build the leave action here so the existing lobby scene and LAN browser
+# continue to work without node-path changes.
+func _build_leave_button() -> void:
+	leave_button = Button.new()
+	leave_button.name = "LeaveServerButton"
+	leave_button.text = "LEAVE SERVER"
+	leave_button.custom_minimum_size = Vector2(0, 46)
+	leave_button.focus_mode = Control.FOCUS_NONE
+	leave_button.add_theme_font_size_override("font_size", 17)
+	leave_button.add_theme_color_override("font_color", Color(1.0, 0.84, 0.89))
+	leave_button.add_theme_color_override("font_hover_color", Color(1.0, 0.94, 0.96))
+	leave_button.add_theme_color_override("font_pressed_color", Color(1.0, 0.84, 0.89))
+	for state in ["normal", "hover", "pressed"]:
+		leave_button.add_theme_stylebox_override(state, join_button.get_theme_stylebox(state))
+	start_button.get_parent().add_child(leave_button)
+	leave_button.pressed.connect(_on_leave_server_button_pressed)
+
+
 #
 # ============================================================
 # CONNECTED UI
@@ -171,6 +193,8 @@ func _set_connected_ui(
 
 	ready_button.visible = \
 		connected
+
+	leave_button.visible = connected
 
 
 	#
@@ -307,6 +331,34 @@ func _on_server_disconnected() -> void:
 	_set_connected_ui(
 		false
 	)
+
+
+#
+# ============================================================
+# LEAVE SERVER (CLIENT LOBBY ONLY)
+# ============================================================
+#
+
+func _on_leave_server_button_pressed() -> void:
+	if not is_connected:
+		return
+
+	# A local ENet client can disconnect without shutting down the game.
+	# The dedicated server receives peer_disconnected and updates its lobby.
+	var current_peer: MultiplayerPeer = multiplayer.multiplayer_peer
+	if current_peer is ENetMultiplayerPeer:
+		current_peer.close()
+
+	NetworkManager._reset_session()
+	local_ready = false
+	ready_button.text = "Ready"
+	join_button.disabled = false
+	status_label.text = "Left server"
+
+	for child in player_list.get_children():
+		child.queue_free()
+
+	_set_connected_ui(false)
 
 
 #
