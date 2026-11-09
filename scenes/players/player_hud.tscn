@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://cxqgd8cgn87tl"]
 
 [ext_resource type="Script" uid="uid://clyfmelbnws5j" path="res://scripts/player/player_hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" uid="uid://ch60a7yogyx47" path="res://scenes/ui/chat_overlay.tscn" id="2_chat"]
+[ext_resource type="PackedScene" path="res://scenes/ui/minimap.tscn" id="3_minimap"]
 
 [sub_resource type="StyleBoxFlat" id="HudPanel"]
 content_margin_left = 12.0
@@ -139,6 +141,7 @@ layout_mode = 2
 text = "[ ] Task 4"
 
 [node name="VerticalSpacer" type="Control" parent="HUDRoot/MarginContainer/Layout" unique_id=2000031530]
+propagate_maximum_size = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -194,3 +197,17 @@ text = "4: Ability"
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
+
+[node name="ChatOverlay" parent="HUDRoot" unique_id=375840895 instance=ExtResource("2_chat")]
+custom_minimum_size = Vector2(220, 240)
+layout_mode = 1
+offset_right = 236.0
+
+[node name="Minimap" parent="HUDRoot" unique_id=1298738763 instance=ExtResource("3_minimap")]
+layout_mode = 1
+anchors_preset = 3
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -256.0
+offset_bottom = -18.0
+grow_vertical = 0

@@ -1,0 +1,68 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="1_minimap"]
+[ext_resource type="Script" path="res://scripts/ui/minimap_map.gd" id="2_map"]
+[ext_resource type="Script" path="res://scripts/ui/minimap_markers.gd" id="3_markers"]
+
+[sub_resource type="StyleBoxFlat" id="MinimapPanel"]
+content_margin_left = 9.0
+content_margin_top = 7.0
+content_margin_right = 9.0
+content_margin_bottom = 9.0
+bg_color = Color(0.07, 0.065, 0.13, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.48, 0.38, 0.68, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Minimap" type="PanelContainer"]
+custom_minimum_size = Vector2(220, 229)
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -236.0
+offset_top = 175.0
+offset_right = -16.0
+offset_bottom = 404.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("MinimapPanel")
+script = ExtResource("1_minimap")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 15
+text = "MINIMAP"
+mouse_filter = 2
+
+[node name="MapFrame" type="SubViewportContainer" parent="VBox"]
+custom_minimum_size = Vector2(196, 196)
+layout_mode = 2
+stretch = true
+mouse_filter = 2
+
+[node name="Viewport" type="SubViewport" parent="VBox/MapFrame"]
+size = Vector2i(192, 192)
+disable_3d = true
+render_target_update_mode = 4
+
+[node name="MapRoot" type="Node2D" parent="VBox/MapFrame/Viewport"]
+
+[node name="MapArt" type="Node2D" parent="VBox/MapFrame/Viewport/MapRoot"]
+script = ExtResource("2_map")
+
+[node name="TeamMarkers" type="Node2D" parent="VBox/MapFrame/Viewport/MapRoot"]
+script = ExtResource("3_markers")
+
+[node name="MapCamera" type="Camera2D" parent="VBox/MapFrame/Viewport/MapRoot"]

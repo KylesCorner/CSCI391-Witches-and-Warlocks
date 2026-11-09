@@ -1,10 +1,10 @@
-extends CanvasLayer
-## Global/team HUD overlay. All shortcuts use project Input Map actions.
+extends PanelContainer
+## Global/team chat, embedded in PlayerHUD. Existing ChatManager RPCs unchanged.
 
-@onready var title_label: Label = $ChatWindow/Contents/Header/ChannelLabel
-@onready var chat_log: RichTextLabel = $ChatWindow/Contents/ChatLog
-@onready var chat_entry: LineEdit = $ChatWindow/Contents/ChatEntry
-@onready var hint_label: Label = $ChatWindow/Contents/HintLabel
+@onready var title_label: Label = $Contents/Header/ChannelLabel
+@onready var chat_log: RichTextLabel = $Contents/ChatLog
+@onready var chat_entry: LineEdit = $Contents/ChatEntry
+@onready var hint_label: Label = $Contents/HintLabel
 
 var _active_channel: int = ChatManager.GLOBAL
 var _typing: bool = false
@@ -12,11 +12,9 @@ var _rendered_count: int = 0
 
 
 func _ready() -> void:
-	# The server has no local player and never creates an interactive chat HUD.
 	if multiplayer.is_server():
 		queue_free()
 		return
-
 	chat_entry.visible = false
 	chat_entry.max_length = ChatManager.MAX_MESSAGE_LENGTH
 	chat_log.scroll_following = true
@@ -32,7 +30,6 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventKey and event.echo:
 		return
-
 	if _typing:
 		if event.is_action_pressed("chat_close"):
 			_close_chat()
@@ -45,7 +42,6 @@ func _input(event: InputEvent) -> void:
 			return
 		get_viewport().set_input_as_handled()
 		return
-
 	if event.is_action_pressed("chat_global"):
 		_open_chat(ChatManager.GLOBAL)
 	elif event.is_action_pressed("chat_team"):
@@ -100,7 +96,6 @@ func _refresh_channel_label() -> void:
 
 func _on_message_received(channel: int, sender_name: String, sender_team: String, message: String) -> void:
 	if _rendered_count >= ChatManager.MAX_HISTORY:
-		# Keep the visible log in sync with the bounded client-side history.
 		chat_log.clear()
 		_rendered_count = 0
 		for entry in ChatManager.history:
@@ -123,8 +118,8 @@ func _append_line(channel: int, sender_name: String, sender_team: String, messag
 	chat_log.push_color(color)
 	chat_log.add_text("[" + label_text + "] " + sender_name)
 	chat_log.pop()
-	chat_log.add_text(": " + message + "\n")
-	# Use add_text, not BBCode parsing, so players can't inject formatting.
+	chat_log.add_text(": " + message + "
+")
 
 
 func _exit_tree() -> void:
