@@ -13,7 +13,6 @@
 [node name="World" type="Node2D" unique_id=659245188]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=625791400]
-visible = false
 color = Color(0, 0, 0, 1)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1529225015]
