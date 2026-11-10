@@ -107,6 +107,12 @@ Developers:
 - Ingrid"
 horizontal_alignment = 1
 
+[node name="AssetsCredits" type="Button" parent="Center/Panel/Content" unique_id=341435445]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+focus_mode = 0
+text = "ASSETS CREDITS"
+
 [node name="ReturnButton" type="Button" parent="Center/Panel/Content" unique_id=659233150]
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
