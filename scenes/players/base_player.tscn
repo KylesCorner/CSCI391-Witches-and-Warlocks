@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://r8mrfcjm4jhk"]
 
-[ext_resource type="SpriteFrames" uid="uid://080rtq7hyanu" path="res://assets/animations/blue_hair_woman.tres" id="1_ggyfd"]
 [ext_resource type="Script" uid="uid://b4cbpnj3g0r63" path="res://scripts/player/player_controller.gd" id="1_vitqv"]
+[ext_resource type="SpriteFrames" uid="uid://oonc5y1fqy6j" path="res://assets/animations/blond_frames.tres" id="2_8nhs3"]
 [ext_resource type="Script" uid="uid://be54qpn25xof1" path="res://scripts/player/player_multiplayer_sync.gd" id="2_vitqv"]
 [ext_resource type="PackedScene" uid="uid://ctku8dm2jhbwo" path="res://scenes/players/player_tag.tscn" id="4_kvbc1"]
 [ext_resource type="Script" uid="uid://djw50hf3h3okw" path="res://scripts/gameplay/ability_controller.gd" id="5_hys06"]
@@ -16,10 +16,8 @@ size = Vector2(15, 12)
 script = ExtResource("1_vitqv")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=765943247]
-sprite_frames = ExtResource("1_ggyfd")
+sprite_frames = ExtResource("2_8nhs3")
 animation = &"Walk Right"
-frame = 3
-frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1463385978]
 position = Vector2(0, 6)
@@ -30,11 +28,11 @@ zoom = Vector2(1.5, 1.5)
 
 [node name="PointLight2D" type="PointLight2D" parent="." unique_id=584061640]
 enabled = false
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 1)
+shadow_filter = 1
 texture = ExtResource("6_light")
 texture_scale = 2.75
-shadow_enabled = true
-shadow_filter = 1
-shadow_color = Color(0, 0, 0, 1)
 
 [node name="MultiplayerSync" type="Node2D" parent="." unique_id=912018745]
 script = ExtResource("2_vitqv")

@@ -131,7 +131,7 @@ region = Rect2(64, 192, 32, 32)
 atlas = ExtResource("2_ue367")
 region = Rect2(96, 192, 32, 32)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_n2tkr"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_ue367"]
 resource_local_to_scene = true
 animations = [{
 "frames": [{
@@ -147,7 +147,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_4a7j4")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Idle Back",
 "speed": 5.0
 }, {
@@ -164,7 +164,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_qf00r")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Idle Front",
 "speed": 5.0
 }, {
@@ -181,7 +181,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_exvne")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Idle Left",
 "speed": 5.0
 }, {
@@ -198,7 +198,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_pm1or")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Idle Right",
 "speed": 5.0
 }, {
@@ -215,7 +215,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_p5bb3")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Walk Back",
 "speed": 5.0
 }, {
@@ -232,7 +232,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_wgnyl")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Walk Front",
 "speed": 5.0
 }, {
@@ -249,7 +249,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_e2b0a")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Walk Left",
 "speed": 5.0
 }, {
@@ -266,7 +266,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_l13bq")
 }],
-"loop": 0,
+"loop": 2,
 "name": &"Walk Right",
 "speed": 5.0
 }]
@@ -274,7 +274,5 @@ animations = [{
 [node name="Warlock" unique_id=1914179753 instance=ExtResource("1_ue367")]
 
 [node name="AnimatedSprite2D" parent="." index="0" unique_id=765943247]
-sprite_frames = SubResource("SpriteFrames_n2tkr")
-animation = &"Idle Back"
-frame = 0
-frame_progress = 0.0
+sprite_frames = SubResource("SpriteFrames_ue367")
+animation = &"Walk Right"
