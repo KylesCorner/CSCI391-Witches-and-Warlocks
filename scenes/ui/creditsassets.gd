@@ -2,9 +2,9 @@ extends Control
 ## Scrolling credits scene — dark blue & purple theme (Godot 4.x)
 ## Controls: hold Enter/Space (ui_accept) to speed up, Esc (ui_cancel) to skip.
 
-@export var scroll_speed: float = 60.0          # pixels per second
+@export var scroll_speed: float = 100.0          # pixels per second
 @export var fast_multiplier: float = 4.0        # speed while holding ui_accept
-@export_file("*.tscn") var next_scene: String = ""  # leave empty to loop the credits
+@export_file("*.tscn") var next_scene: String = "res://scenes/lobby.tscn"
 
 # ---------- Colours ----------
 const COL_TITLE   := "#e0c8ff"  # pale lavender
@@ -156,6 +156,7 @@ func _build_text() -> String:
 		t += _entry(s[0], s[1], s[2], s[3])
 
 	t += "\n\n[font_size=40][color=%s]Thank you for playing![/color][/font_size]\n" % COL_TITLE
+	t += "[color=%s]Click escape to leave"
 	t += "[/center]"
 	return t
 
@@ -191,9 +192,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		_finish()
 
-
 func _finish() -> void:
-	if next_scene != "":
-		get_tree().change_scene_to_file("res://scenes/lobby.tscn")
-	else:
-		_reset_position()  # loop
+	_ready_to_scroll = false  # stop it firing again every frame
+	print("Credits finished, going to: ", next_scene)
+	var err := get_tree().change_scene_to_file(next_scene)
+	if err != OK:
+		push_error("Couldn't load scene: %s (error %d)" % [next_scene, err])
