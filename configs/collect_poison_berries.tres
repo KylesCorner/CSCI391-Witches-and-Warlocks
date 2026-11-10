@@ -1,11 +1,13 @@
 [gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://im5s1kvl72um"]
 
 [ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/gameplay/task_config.gd" id="1_cpb"]
+[ext_resource type="AudioStream" uid="uid://dynuqej4eupix" path="res://assets/Sounds/352900__sastoryteller__pick_up_magic_diamonds.wav" id="1_pjiwv"]
 [ext_resource type="Texture2D" uid="uid://by35paljiftww" path="res://assets/berrybush.png" id="2_cpb"]
 
 [resource]
 script = ExtResource("1_cpb")
 name = "Collect Poison Berries"
 sprite = ExtResource("2_cpb")
+interact_sfx = ExtResource("1_pjiwv")
 scale = 0.05
 metadata/_custom_type_script = "uid://dnlw0lm3wloee"

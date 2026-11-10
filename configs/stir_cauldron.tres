@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="TaskConfig" format=3 uid="uid://8ehaysnie2wd"]
 
+[ext_resource type="AudioStream" uid="uid://ba3mjtp3nww6l" path="res://assets/Sounds/caldron.wav" id="1_jqfsi"]
 [ext_resource type="Script" uid="uid://dnlw0lm3wloee" path="res://scripts/gameplay/task_config.gd" id="1_sc"]
 [ext_resource type="Texture2D" uid="uid://drnnw0t3ditkx" path="res://assets/Cauldron.png" id="2_sc"]
 
@@ -7,5 +8,6 @@
 script = ExtResource("1_sc")
 name = "Stir Cauldron"
 sprite = ExtResource("2_sc")
+interact_sfx = ExtResource("1_jqfsi")
 scale = 0.05
 metadata/_custom_type_script = "uid://dnlw0lm3wloee"

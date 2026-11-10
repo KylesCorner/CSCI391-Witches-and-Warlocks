@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cg8dabjo3fdm2"
-path="res://.godot/imported/429381__carolinagg__21-flor.wav-6fea060dec5640bfadddf0c57016d4ec.sample"
+path="res://.godot/imported/429381__carolinagg__21-flor.wav-ca908c42595f17043943ff1f04c2d6a6.sample"
 
 [deps]
 
-source_file="res://assets/429381__carolinagg__21-flor.wav"
-dest_files=["res://.godot/imported/429381__carolinagg__21-flor.wav-6fea060dec5640bfadddf0c57016d4ec.sample"]
+source_file="res://assets/Sounds/429381__carolinagg__21-flor.wav"
+dest_files=["res://.godot/imported/429381__carolinagg__21-flor.wav-ca908c42595f17043943ff1f04c2d6a6.sample"]
 
 [params]
 
